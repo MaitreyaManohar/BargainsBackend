@@ -102,18 +102,16 @@ public class ItemService {
         System.out.println(listofitems);
 
         for(ItemClass item : listofitems){
-            System.out.println("This is the ratio: for "+item.getItemName()+searchname+FuzzySearch.ratio(item.getItemName(),searchname));
-            if(FuzzySearch.ratio(item.getItemName(),searchname)>50){
+            System.out.println("This is the ratio: for "+item.getItemName()+searchname+FuzzySearch.weightedRatio(item.getItemName(),searchname));
+            if(FuzzySearch.weightedRatio(item.getItemName(),searchname)>50){
                 searcheditems.add(item);
             }
 
             Collections.sort(searcheditems,new SortById(searchname));
 
         }
-        if(searcheditems.isEmpty()) {
-            System.out.println("IT IS EMPTY");
-            throw new ResponseStatusException(HttpStatus.OK,"Cart is Empty");}
-        else return searcheditems;
+
+        return searcheditems;
     }
 
     @Transactional
@@ -139,6 +137,6 @@ class SortById implements Comparator<ItemClass> {
     // Used for sorting in ascending order of ID
     public int compare(ItemClass a, ItemClass b)
     {
-        return FuzzySearch.ratio(b.getItemName(),searchname) - FuzzySearch.ratio(a.getItemName(),searchname);
+        return FuzzySearch.weightedRatio(b.getItemName(),searchname) - FuzzySearch.weightedRatio(a.getItemName(),searchname);
     }
 }
