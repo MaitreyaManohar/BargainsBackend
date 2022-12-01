@@ -96,9 +96,9 @@ public class UserController {
     @PostMapping(path = "/signup")
     public void addUser(@RequestBody addUserClass userClass){
         String s = userService.addUser(userClass);
-        if(s.equals("SUCCESS")){
-            emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
-        }
+        // if(s.equals("SUCCESS")){
+        //     emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
+        // }
     }
 
     @PostMapping(path = "/modifyuser")
