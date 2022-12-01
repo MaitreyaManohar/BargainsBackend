@@ -43,12 +43,13 @@ public class UserService {
 
     return userOutput;
     }
-    public void addUser(addUserClass userClass) {
+    public String addUser(addUserClass userClass) {
         UserClass user = new UserClass(userClass.getName(),userClass.getEmail(),userClass.getPhoneNo(),userClass.getAddress(),userClass.getRole(),encoder.encode(userClass.getPassword()));
         Ewallet ewallet = new Ewallet(user,userClass.getBalance());
         user.setEwallet(ewallet);
         userRepository.save(user);
         eWalletRepository.save(ewallet);
+        return "SUCCESS";
 
     }
 
@@ -115,5 +116,17 @@ public class UserService {
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         }
         else return new ResponseEntity<>("BADREQUEST", HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> modifyUser(addUserClass userClass) {
+        UserClass user = userRepository.findById(userClass.getId()).get();
+        if (user != null) {
+            user.setPhoneNo(userClass.getPhoneNo());
+            user.setAddress(userClass.getAddress());
+            user.setName(userClass.getName());
+            userRepository.save(user);
+            return new ResponseEntity<>("SUCCESSFULLY MODIFIED USER", HttpStatus.OK);
+        } else return new ResponseEntity<>("FAILED TO MODIFY", HttpStatus.BAD_REQUEST);
+
     }
 }

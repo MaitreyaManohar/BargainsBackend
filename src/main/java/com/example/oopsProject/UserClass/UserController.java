@@ -9,23 +9,20 @@ import com.example.oopsProject.Images.StorageService;
 import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Items.ItemService;
 
-import com.example.oopsProject.Orders.OrderClass;
+import com.example.oopsProject.Mail.EmailDetails;
+import com.example.oopsProject.Mail.EmailService;
 import com.example.oopsProject.Orders.OrderService;
 import com.example.oopsProject.OutputClasses.OrderOutput;
 import com.example.oopsProject.OutputClasses.ProductOutput;
 import com.example.oopsProject.OutputClasses.UserOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,14 +39,17 @@ public class UserController {
     private final EWalletService eWalletService;
 
     private final StorageService imageService;
+
+    private final EmailService emailService;
     @Autowired
-    public UserController(UserService userService, CartService cartService, ItemService itemService, OrderService orderService, EWalletService eWalletService, StorageService imageService) {
+    public UserController(UserService userService, CartService cartService, ItemService itemService, OrderService orderService, EWalletService eWalletService, StorageService imageService, EmailService emailService) {
         this.eWalletService = eWalletService;
         this.orderService = orderService;
         this.userService = userService;
         this.cartService = cartService;
         this.itemService = itemService;
         this.imageService = imageService;
+        this.emailService = emailService;
     }
 
     @GetMapping("admin/getusers")
@@ -95,8 +95,15 @@ public class UserController {
 
     @PostMapping(path = "/signup")
     public void addUser(@RequestBody addUserClass userClass){
-        userService.addUser(userClass);
+        String s = userService.addUser(userClass);
+        if(s.equals("SUCCESS")){
+            emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
+        }
+    }
 
+    @PostMapping(path = "/modifyuser")
+    public void modifyUser(@RequestBody addUserClass userClass){
+        userService.modifyUser(userClass);
     }
 
     @PostMapping(path = "/customer/addtocart")
@@ -172,9 +179,9 @@ public class UserController {
 
 
 
-    @PostMapping("/search")
-    public List<ItemClass> search(@RequestBody SearchClass searchClass){
-        return itemService.search(searchClass.getSearch(),searchClass.getUserid());
+    @GetMapping("/search/{searchname}")
+    public List<ItemClass> search(@PathVariable("searchname") String searchname){
+        return itemService.search(searchname);
     }
 
 }

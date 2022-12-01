@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -94,23 +96,24 @@ public class ItemService {
     }
 
     @Transactional
-    public List<ItemClass> search(String searchname,long userid) {
+    public List<ItemClass> search(String searchname) {
         List<ItemClass> listofitems = itemRepository.findAll();
         List<ItemClass> searcheditems = new ArrayList<ItemClass>();
-        UserClass user = userRepository.findById(userid).get();
         System.out.println(listofitems);
-        if(user.getRole().equals(Role.CUSTOMER) || user.getRole().equals(Role.ADMIN)){
+
         for(ItemClass item : listofitems){
             System.out.println("This is the ratio: for "+item.getItemName()+searchname+FuzzySearch.ratio(item.getItemName(),searchname));
             if(FuzzySearch.ratio(item.getItemName(),searchname)>50){
                 searcheditems.add(item);
             }
-        }
+
             Collections.sort(searcheditems,new SortById(searchname));
 
         }
-
-        return searcheditems;
+        if(searcheditems.isEmpty()) {
+            System.out.println("IT IS EMPTY");
+            throw new ResponseStatusException(HttpStatus.OK,"Cart is Empty");}
+        else return searcheditems;
     }
 
     @Transactional
