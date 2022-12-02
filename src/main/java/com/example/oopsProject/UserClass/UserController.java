@@ -89,9 +89,9 @@ public class UserController {
         return orderService.getPastOrders(customerId);
     }
 
-    @GetMapping(path = "customer/getcart/{id}")
-    public List<Cart> getCartbyId(@PathVariable("id") long id){
-        return cartService.getCartById(id);
+    @PostMapping(path = "customer/getcart")
+    public List<Cart> getCartbyId(@RequestBody addUserClass addUserClass){
+        return cartService.getCartById(addUserClass.getId());
     }
 
 
