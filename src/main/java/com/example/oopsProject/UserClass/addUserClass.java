@@ -23,6 +23,16 @@ public class addUserClass {
         this.password = password;
     }
 
+    public addUserClass(UserClass user){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.address = user.getAddress();
+        this.phoneNo = user.getPhoneNo();
+        this.phoneNo = user.getPhoneNo();
+        this.role = user.getRole();
+        this.password = null;
+    }
+
     public void setId(long id) {
         this.id = id;
     }

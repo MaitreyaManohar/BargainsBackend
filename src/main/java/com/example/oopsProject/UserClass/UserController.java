@@ -94,8 +94,8 @@ public class UserController {
 
 
     @PostMapping(path = "/signup")
-    public UserOutput addUser(@RequestBody addUserClass userClass){
-        UserOutput l = userService.addUser(userClass);
+    public addUserClass addUser(@RequestBody addUserClass userClass){
+        addUserClass l = userService.addUser(userClass);
         if(l!=null && userClass.getRole().equals(Role.CUSTOMER)){
             emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
         }
@@ -119,7 +119,7 @@ public class UserController {
 
 
     @PostMapping(path = "/login")
-    public String login(@RequestBody LoginClass loginClass, HttpServletResponse response){
+    public addUserClass login(@RequestBody LoginClass loginClass, HttpServletResponse response){
         return userService.login(loginClass.getEmail(),loginClass.getPassword());
 //        cookie.setMaxAge(7 * 24 * 60 * 60);
 ////        cookie.setSecure(true);

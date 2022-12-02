@@ -50,7 +50,7 @@ public class UserService extends EmailService {
 
     return userOutput;
     }
-    public UserOutput addUser(addUserClass userClass) {
+    public addUserClass addUser(addUserClass userClass) {
 
         UserClass user = new UserClass(userClass.getName(),userClass.getEmail(),userClass.getPhoneNo(),userClass.getAddress(),userClass.getRole(),encoder.encode(userClass.getPassword()));
         if(userClass.getRole().equals(Role.MANAGER)) user.setApproved(false);
@@ -58,7 +58,7 @@ public class UserService extends EmailService {
         user.setEwallet(ewallet);
         userRepository.save(user);
         eWalletRepository.save(ewallet);
-        return new UserOutput(user);
+        return new addUserClass(user);
 
     }
 
@@ -106,7 +106,7 @@ public class UserService extends EmailService {
         return userRepository.findById(userid).get();
     }
 
-    public String login(String email,String password) {
+    public addUserClass login(String email,String password) {
         UserClass user = userRepository.findByEmail(email).get();
         if(user.getRole().equals(Role.MANAGER) && user.isApproved()==false){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Status has not been approved!");
@@ -115,12 +115,12 @@ public class UserService extends EmailService {
             user.setLoggedin(true);
             userRepository.save(user);
             System.out.println("OK");
-            return String.valueOf(user.getId());
+            return new addUserClass(user);
 
         }
         else{
             System.out.println("NOT OK");
-            return "User Does Not Exist";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User Does not exist");
         }
     }
 
