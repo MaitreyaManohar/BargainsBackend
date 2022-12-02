@@ -50,7 +50,7 @@ public class UserService extends EmailService {
 
     return userOutput;
     }
-    public long addUser(addUserClass userClass) {
+    public UserOutput addUser(addUserClass userClass) {
 
         UserClass user = new UserClass(userClass.getName(),userClass.getEmail(),userClass.getPhoneNo(),userClass.getAddress(),userClass.getRole(),encoder.encode(userClass.getPassword()));
         if(userClass.getRole().equals(Role.MANAGER)) user.setApproved(false);
@@ -58,7 +58,7 @@ public class UserService extends EmailService {
         user.setEwallet(ewallet);
         userRepository.save(user);
         eWalletRepository.save(ewallet);
-        return user.getId();
+        return new UserOutput(user);
 
     }
 
@@ -212,4 +212,11 @@ public class UserService extends EmailService {
     }
 }
 
+    public UserOutput getuserinfo(long id) {
+        UserClass user = userRepository.findById(id).get();
+        if(user.isLoggedin()){
+            return new UserOutput(user);
+        }
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access");
+    }
 }

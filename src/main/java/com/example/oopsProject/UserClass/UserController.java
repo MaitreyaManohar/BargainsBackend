@@ -1,6 +1,7 @@
 package com.example.oopsProject.UserClass;
 
 
+import com.example.oopsProject.Admin.getOrdersClass;
 import com.example.oopsProject.Cart.Cart;
 import com.example.oopsProject.Cart.CartService;
 import com.example.oopsProject.Ewallet.EWalletService;
@@ -60,13 +61,18 @@ public class UserController {
         return itemService.getItems(addUserClass.getId());
     }
 
+
+
     @GetMapping("customer/getitem/{itemid}")
     public ProductOutput getItem(@PathVariable long itemid){
         return itemService.getItem(itemid);
     }
 
 
-
+    @PostMapping("customer/getuserinfo")
+    public UserOutput getUserInfo(@RequestBody getOrdersClass getOrdersClass){
+        return userService.getuserinfo(getOrdersClass.getId());
+    }
 
     @GetMapping(path = "customer/getcartbyid/{id}")
     public Optional<Cart> getcartByCartid(@PathVariable("id") long id){
@@ -88,9 +94,9 @@ public class UserController {
 
 
     @PostMapping(path = "/signup")
-    public long addUser(@RequestBody addUserClass userClass){
-        long l = userService.addUser(userClass);
-        if(l!=0 && userClass.getRole().equals(Role.CUSTOMER)){
+    public UserOutput addUser(@RequestBody addUserClass userClass){
+        UserOutput l = userService.addUser(userClass);
+        if(l!=null && userClass.getRole().equals(Role.CUSTOMER)){
             emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
         }
         return l;
