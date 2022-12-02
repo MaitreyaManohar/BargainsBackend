@@ -97,7 +97,10 @@ public class UserController {
     public addUserClass addUser(@RequestBody addUserClass userClass){
         addUserClass l = userService.addUser(userClass);
         if(l!=null && userClass.getRole().equals(Role.CUSTOMER)){
-            emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
+            emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","Bargains Account Created"));
+        }
+        else if(l!=null && userClass.getRole().equals(Role.MANAGER)) {
+            emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your application for Bargains manager is accepted and pending!","Bargains Application Pending"));
         }
         return l;
     }
