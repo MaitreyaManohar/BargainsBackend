@@ -27,7 +27,7 @@ public class AdminApi {
         this.orderService = orderService;
     }
 
-    @PostMapping("getusers")
+    @PostMapping("/getusers")
     public List<UserOutput> getUsers(@RequestBody addUserClass addUserClass){
         return userService.getUsers(addUserClass.getId());
     }
