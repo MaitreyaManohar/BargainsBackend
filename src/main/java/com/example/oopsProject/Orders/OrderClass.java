@@ -2,8 +2,6 @@ package com.example.oopsProject.Orders;
 
 import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.UserClass.UserClass;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDate;

@@ -2,7 +2,6 @@ package com.example.oopsProject.Cart;
 
 import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.UserClass.UserClass;
-import org.apache.catalina.User;
 
 import javax.persistence.*;
 

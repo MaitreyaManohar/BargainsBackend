@@ -1,7 +1,5 @@
 package com.example.oopsProject.UserClass;
 
-import javax.persistence.Column;
-
 public class addUserClass {
     private long id;
     private String name;
@@ -9,7 +7,6 @@ public class addUserClass {
     private long phoneNo;
     private Role role;
     private long balance;
-
     private String address;
     private String password;
 

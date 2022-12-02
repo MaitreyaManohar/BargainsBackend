@@ -2,7 +2,6 @@ package com.example.oopsProject.Cart;
 
 import com.example.oopsProject.Ewallet.EWalletRepository;
 import com.example.oopsProject.Ewallet.Ewallet;
-import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Items.ItemRepository;
 import com.example.oopsProject.Mail.EmailDetails;
 import com.example.oopsProject.Mail.EmailService;
@@ -11,7 +10,6 @@ import com.example.oopsProject.Orders.OrderRepository;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
 import com.example.oopsProject.UserClass.UserRepository;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,7 +89,7 @@ public class CartService extends EmailService {
         for (int i = 0;i<cartList.size();i++) {
             if (cartList.get(i).get().itemClass.getQty() > cartList.get(i).get().qtybought) {
                 System.out.println("IT IS TRUE");
-                total = total + cartList.get(i).get().itemClass.getPrice() * cartList.get(i).get().qtybought;
+                total = total + cartList.get(i).get().itemClass.priceWithOffer() * cartList.get(i).get().qtybought;
 
             }
             System.out.println("THIS IS I "+i);

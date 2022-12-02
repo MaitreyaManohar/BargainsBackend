@@ -1,12 +1,7 @@
 package com.example.oopsProject.OutputClasses;
 
-import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Orders.OrderClass;
-import com.example.oopsProject.UserClass.UserClass;
-import org.apache.catalina.User;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.time.LocalDate;
 
 public class OrderOutput {

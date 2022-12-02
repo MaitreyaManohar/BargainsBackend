@@ -3,9 +3,6 @@ package com.example.oopsProject.Items;
 import com.example.oopsProject.Images.ImageData;
 import com.example.oopsProject.Orders.OrderClass;
 import com.example.oopsProject.UserClass.Category;
-import com.example.oopsProject.UserClass.UserClass;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -39,7 +36,7 @@ public class ItemClass {
     private ImageData image;
     private int price;
     private int deliveryWithin;
-    private int offer;
+    private int offer=0;
     private LocalDate offerValidTill;
 
     private LocalDate dateAdded;
@@ -179,5 +176,9 @@ public class ItemClass {
 
     public void setOfferValidTill(LocalDate offerValidTill) {
         this.offerValidTill = offerValidTill;
+    }
+
+    public int priceWithOffer(){
+        return ((100-this.offer)*this.price)/100;
     }
 }

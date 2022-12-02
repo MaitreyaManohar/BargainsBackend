@@ -61,6 +61,10 @@ public class UserController {
         return itemService.getItems(addUserClass.getId());
     }
 
+    @PostMapping("/customer/buyitem")
+    public ResponseEntity<?> buyItem(@RequestBody addToCartClass addToCartClass){
+        return itemService.buyItem(addToCartClass.getUserid(), addToCartClass.getProductid(),addToCartClass.getQtybought());
+    }
 
 
     @GetMapping("customer/getitem/{itemid}")
@@ -69,7 +73,7 @@ public class UserController {
     }
 
 
-    @PostMapping("customer/getuserinfo")
+    @PostMapping("/getuserinfo")
     public UserOutput getUserInfo(@RequestBody getOrdersClass getOrdersClass){
         return userService.getuserinfo(getOrdersClass.getId());
     }
@@ -133,10 +137,15 @@ public class UserController {
 
     }
     @PostMapping("manager/additem")
-    public ResponseEntity<?> addItem(@RequestBody addItemClass addItem){
+    public long addItem(@RequestBody addItemClass addItem){
         return itemService.addItem(addItem);
     }
 
+    @GetMapping("item/{category}")
+    public List<ProductOutput> getItemsByCategory(@PathVariable("category") Category category){
+        System.out.println(category);
+        return itemService.getItemsByCategory(category);
+    }
     @PostMapping("/customer/buyfromcart")
     public ResponseEntity<?> buyFromCart(@RequestBody BuyFromCartClass userClass){
         System.out.println("Running the buyfromcartmethod");

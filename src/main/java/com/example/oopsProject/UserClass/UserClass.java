@@ -2,16 +2,11 @@ package com.example.oopsProject.UserClass;
 
 import com.example.oopsProject.Cart.Cart;
 import com.example.oopsProject.Ewallet.Ewallet;
-import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Orders.OrderClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.criterion.Order;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table()

@@ -1,13 +1,14 @@
 package com.example.oopsProject.Items;
 
+import com.example.oopsProject.Ewallet.EWalletRepository;
+import com.example.oopsProject.Ewallet.Ewallet;
+import com.example.oopsProject.Mail.EmailDetails;
+import com.example.oopsProject.Mail.EmailService;
+import com.example.oopsProject.Orders.OrderClass;
+import com.example.oopsProject.Orders.OrderRepository;
 import com.example.oopsProject.OutputClasses.ProductOutput;
-import com.example.oopsProject.OutputClasses.UserOutput;
-import com.example.oopsProject.UserClass.Role;
-import com.example.oopsProject.UserClass.UserClass;
-import com.example.oopsProject.UserClass.UserRepository;
-import com.example.oopsProject.UserClass.addItemClass;
+import com.example.oopsProject.UserClass.*;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,20 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-public class ItemService {
+public class ItemService extends EmailService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+
+    private final EWalletRepository eWalletRepository;
+
+    private final OrderRepository orderRepository;
     @Autowired
-    public ItemService(ItemRepository itemRepository,UserRepository userRepository) {
+    public ItemService(ItemRepository itemRepository, UserRepository userRepository, EWalletRepository eWalletRepository, OrderRepository orderRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.eWalletRepository = eWalletRepository;
+
+        this.orderRepository = orderRepository;
     }
 
     public List<ProductOutput> getItems(long id) {
@@ -44,17 +52,17 @@ public class ItemService {
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access!");
     }
 
-    public ResponseEntity<?> addItem(addItemClass additem) {
+    public long addItem(addItemClass additem) {
         UserClass buyer = userRepository.findById(additem.getUser_id()).get();
-        if(buyer.getRole().equals(Role.MANAGER) && buyer.isLoggedin()){
+        if((buyer.getRole().equals(Role.MANAGER) || buyer.getRole().equals(Role.ADMIN)) && buyer.isLoggedin()){
         ItemClass item = new ItemClass(additem.getItemName(),true
                 ,additem.getQty(),additem.getCategory(), additem.getPrice(), additem.getDeliveryWithin(),
                 additem.getOffer(),additem.getOfferValidTill(),additem.getDateAdded());
         item.setDateAdded(LocalDate.now());
         itemRepository.save(item);
-            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+            return item.getItemId();
         }
-        else return new ResponseEntity<>("UNAUTHORIZEDACCESS",HttpStatus.BAD_REQUEST);
+        else throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"UNAUTHORIZEDACCESS");
     }
 
     public void changeProductionStatus(long itemId,boolean status) {
@@ -126,6 +134,47 @@ public class ItemService {
         }
         else{
             return new ResponseEntity<>("UNAUTHORIZED METHOD",HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity<?> buyItem(long userid, long productid, int qtybought) {
+        UserClass user = userRepository.findById(userid).get();
+        ItemClass item = itemRepository.findById(productid).get();
+        Ewallet eWallet = eWalletRepository.findByowner(user).get();
+        System.out.println("THIS IS QTY BOUGHt");
+        if(user.getRole().equals(Role.CUSTOMER) && user.isLoggedin()){
+            if(user.getEwallet().getBalance()>=qtybought*item.priceWithOffer() && item.getQty()>=qtybought){
+                eWallet.setBalance(eWallet.getBalance()-qtybought*item.priceWithOffer());
+                eWalletRepository.save(eWallet);
+                user.setEwallet(eWallet);
+                item.setQty(item.getQty()-qtybought);
+                itemRepository.save(item);
+                userRepository.save(user);
+                orderRepository.save(new OrderClass(user,item, LocalDate.now(),qtybought));
+                sendSimpleMail(new EmailDetails(user.getEmail(),"ORDER SUCCESSFUL",null));
+                return new ResponseEntity<>("Successfully Bought!",HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>("Insufficient Balance",HttpStatus.BAD_REQUEST);
+
+            }
+        }
+        else return new ResponseEntity<>("Unauthorized Request",HttpStatus.BAD_REQUEST);
+    }
+
+    @Transactional
+    public List<ProductOutput> getItemsByCategory(Category category) {
+        try{
+            System.out.println(category.equals(Category.GROCERIES));
+            List<Optional<ItemClass>> items = itemRepository.findByCategory(category);
+            List<ProductOutput> productOutputs = new ArrayList<>();
+            for(Optional<ItemClass> itemClass : items){
+                productOutputs.add(new ProductOutput(itemClass.get()));
+            }
+            return productOutputs;
+        }
+        catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Fatal Error!");
         }
     }
 }

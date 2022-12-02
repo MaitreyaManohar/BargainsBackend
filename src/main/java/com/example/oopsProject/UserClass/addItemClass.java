@@ -24,6 +24,10 @@ public class    addItemClass {
 
     private LocalDate dateAdded;
 
+    public addItemClass(Category category){
+        this.category = category;
+
+    }
     public addItemClass(String itemName, int qty, Category category, long user_id, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded) {
         this.itemName = itemName;
         this.qty = qty;

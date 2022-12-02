@@ -1,11 +1,8 @@
 package com.example.oopsProject.OutputClasses;
 
 import com.example.oopsProject.Ewallet.Ewallet;
-import com.example.oopsProject.Orders.OrderClass;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
-
-import javax.persistence.Column;
 
 public class UserOutput {
     private String name;

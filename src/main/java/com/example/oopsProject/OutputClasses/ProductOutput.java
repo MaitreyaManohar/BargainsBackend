@@ -2,11 +2,8 @@ package com.example.oopsProject.OutputClasses;
 
 import com.example.oopsProject.Images.ImageData;
 import com.example.oopsProject.Items.ItemClass;
-import com.example.oopsProject.Orders.OrderClass;
 import com.example.oopsProject.UserClass.Category;
-import com.example.oopsProject.UserClass.UserClass;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 public class ProductOutput {

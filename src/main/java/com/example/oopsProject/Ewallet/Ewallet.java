@@ -43,6 +43,10 @@ public class Ewallet {
         return balance;
     }
 
+    public void setBalance(long balance) {
+        this.balance = balance;
+    }
+
     public void topUp(long amount){
         balance+=amount;
     }

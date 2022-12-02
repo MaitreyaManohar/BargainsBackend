@@ -1,13 +1,11 @@
 package com.example.oopsProject.UserClass;
 
-import com.example.oopsProject.Cart.Cart;
 import com.example.oopsProject.Ewallet.EWalletRepository;
 import com.example.oopsProject.Ewallet.Ewallet;
 import com.example.oopsProject.Mail.EmailDetails;
 import com.example.oopsProject.Mail.EmailService;
 import com.example.oopsProject.OutputClasses.UserOutput;
 import com.example.oopsProject.Security.passwordencoder;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

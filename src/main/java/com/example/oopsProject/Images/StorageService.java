@@ -12,9 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.awt.*;
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Optional;
 
 @Service
@@ -33,7 +31,7 @@ public class StorageService {
     public String uploadImage(MultipartFile file, Long itemid, Long requesterId) throws IOException {
         ItemClass item = itemRepository.findById(itemid).get();
         UserClass manager = userRepository.findById(requesterId).get();
-        if(manager.isLoggedin() && manager.getRole().equals(Role.MANAGER)){
+        if(manager.isLoggedin() && (manager.getRole().equals(Role.MANAGER) || manager.getRole().equals(Role.ADMIN))){
         if(item.getImage()!=null) {
             ImageData imagecheck = storageRepository.findByItem(item).get();
             imagecheck.setImageData(file.getBytes());
