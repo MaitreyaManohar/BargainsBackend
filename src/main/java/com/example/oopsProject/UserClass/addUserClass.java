@@ -23,6 +23,10 @@ public class addUserClass {
         this.password = password;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getAddress() {
         return address;
     }

@@ -3,6 +3,8 @@ package com.example.oopsProject.UserClass;
 import com.example.oopsProject.Cart.Cart;
 import com.example.oopsProject.Ewallet.EWalletRepository;
 import com.example.oopsProject.Ewallet.Ewallet;
+import com.example.oopsProject.Mail.EmailDetails;
+import com.example.oopsProject.Mail.EmailService;
 import com.example.oopsProject.OutputClasses.UserOutput;
 import com.example.oopsProject.Security.passwordencoder;
 import org.apache.catalina.User;
@@ -10,13 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService extends EmailService {
 
     private final passwordencoder encoder;
     private final UserRepository userRepository;
@@ -28,13 +31,17 @@ public class UserService {
         this.encoder =  encoder;
     }
 
-    public List<UserOutput> getUsers() {
+    public List<UserOutput> getUsers(long id) {
+        UserClass getuser = userRepository.findById(id).get();
+        if(getuser.getRole().equals(Role.ADMIN) && getuser.isLoggedin()){
         List<UserOutput> userOutputs = new ArrayList<>();
         for(UserClass user:userRepository.findAll()){
             UserOutput userOutput = new UserOutput(user.getName(),user.getEmail(),user.getPhoneNo(),user.getEwallet(),user.getRole(),user.getAddress());
             userOutputs.add(userOutput);
         }
-        return userOutputs;
+            return userOutputs;
+        }
+        else throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized User");
     }
 
     public UserOutput getUser(long id){
@@ -43,13 +50,15 @@ public class UserService {
 
     return userOutput;
     }
-    public String addUser(addUserClass userClass) {
+    public long addUser(addUserClass userClass) {
+
         UserClass user = new UserClass(userClass.getName(),userClass.getEmail(),userClass.getPhoneNo(),userClass.getAddress(),userClass.getRole(),encoder.encode(userClass.getPassword()));
+        if(userClass.getRole().equals(Role.MANAGER)) user.setApproved(false);
         Ewallet ewallet = new Ewallet(user,userClass.getBalance());
         user.setEwallet(ewallet);
         userRepository.save(user);
         eWalletRepository.save(ewallet);
-        return "SUCCESS";
+        return user.getId();
 
     }
 
@@ -99,14 +108,19 @@ public class UserService {
 
     public String login(String email,String password) {
         UserClass user = userRepository.findByEmail(email).get();
-        if(user.getPassword().equals(encoder.encode(password)) && user!=null){
+        if(user.getRole().equals(Role.MANAGER) && user.isApproved()==false){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Status has not been approved!");
+        }
+        else if(user.getPassword().equals(encoder.encode(password)) && user!=null){
+            user.setLoggedin(true);
+            userRepository.save(user);
             System.out.println("OK");
             return String.valueOf(user.getId());
 
         }
         else{
             System.out.println("NOT OK");
-            return "null";
+            return "User Does Not Exist";
         }
     }
 
@@ -120,7 +134,9 @@ public class UserService {
 
     public ResponseEntity<?> modifyUser(addUserClass userClass) {
         UserClass user = userRepository.findById(userClass.getId()).get();
-        if (user != null) {
+        System.out.println(user.getName());
+        System.out.println(user.isLoggedin());
+        if (user.isLoggedin()) {
             user.setPhoneNo(userClass.getPhoneNo());
             user.setAddress(userClass.getAddress());
             user.setName(userClass.getName());
@@ -129,4 +145,71 @@ public class UserService {
         } else return new ResponseEntity<>("FAILED TO MODIFY", HttpStatus.BAD_REQUEST);
 
     }
+
+    public List<UserOutput> approveManagers(long requesterid) {
+        UserClass admin = userRepository.findById(requesterid).get();
+        if((admin!=null && admin.getRole().equals(Role.ADMIN))&& admin.isLoggedin()){
+        List<Optional<UserClass>> users = userRepository.findByApprovedAndRole(false,Role.MANAGER);
+        List<UserOutput> userOutputs = new ArrayList<>();
+        for(Optional<UserClass> userClass : users){
+            UserClass user = userClass.get();
+            userOutputs.add(new UserOutput(user));
+        }
+        return userOutputs;
+        }
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access!!");
+
+    }
+
+    public ResponseEntity<?> approveManager(long id,long requesterid) {
+        UserClass admin = userRepository.findById(requesterid).get();
+        if(admin.isLoggedin() && admin.getRole().equals(Role.ADMIN)){
+        UserClass userClass = userRepository.findById(id).get();
+        if(userClass.isApproved()==false && userClass.getRole().equals(Role.MANAGER)){
+        userClass.setApproved(true);
+        userRepository.save(userClass);
+        sendSimpleMail(new EmailDetails(userClass.getEmail(),"Dear "+
+                userClass.getName()+
+                ",\n Your request has been approved! ","Approval in Bargains"));
+        return new ResponseEntity<>("SUCCESSFULLY APPROVED",HttpStatus.OK);}
+        else return new ResponseEntity<>("Error while trying to approve",HttpStatus.BAD_REQUEST);}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Admin privelages not accessible");
+}
+
+    public List<UserOutput> approvedManagers(long id) {
+        UserClass admin = userRepository.findById(id).get();
+        if(admin.isLoggedin() && admin.getRole().equals(Role.ADMIN)){
+        List<Optional<UserClass>> users = userRepository.findByApprovedAndRole(true,Role.MANAGER);
+        List<UserOutput> userOutputs = new ArrayList<>();
+        for(Optional<UserClass> userClass : users){
+            UserClass user = userClass.get();
+            userOutputs.add(new UserOutput(user));
+        }
+        return userOutputs;}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bad request");
+    }
+
+    public UserOutput adminGetUser(long id, long requesterId) {
+        UserClass sender = userRepository.findById(requesterId).get();
+        if(sender.getRole().equals(Role.ADMIN) && sender.isLoggedin()){
+        UserClass userClass = userRepository.findById(id).get();
+        return new UserOutput(userClass);}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access");
+    }
+
+    public ResponseEntity<?> logout(long id) {
+    try{
+        UserClass user = userRepository.findById(id).get();
+        if(user.isLoggedin()){
+            user.setLoggedin(false);
+            userRepository.save(user);
+            return new ResponseEntity<>("Successfully Logged Out!",HttpStatus.OK);
+        }
+        else return new ResponseEntity<>("You are already logged out!",HttpStatus.BAD_REQUEST);
+    }
+    catch(Exception e){
+        return new ResponseEntity<>("Fatal Error!",HttpStatus.BAD_REQUEST);
+    }
+}
+
 }

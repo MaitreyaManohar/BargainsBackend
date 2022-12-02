@@ -32,6 +32,8 @@ public class UserClass {
     @Column(nullable = false,unique = true)
     private long phoneNo;
 
+    private boolean loggedin = false;
+    private boolean approved = false;
     @Column(name="Address")
     String address;
 
@@ -69,6 +71,22 @@ public class UserClass {
 
     public UserClass(){
 
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    public boolean isLoggedin() {
+        return loggedin;
+    }
+
+    public void setLoggedin(boolean loggedin) {
+        this.loggedin = loggedin;
     }
 
     public String getAddress() {

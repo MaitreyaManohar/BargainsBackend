@@ -9,7 +9,9 @@ import com.example.oopsProject.UserClass.UserRepository;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class OrderService {
     @Transactional
     public List<OrderOutput> getPastOrders(long customerId) {
         UserClass user = userRepository.findById(customerId).get();
+        if(user.isLoggedin() && user.getRole().equals(Role.CUSTOMER)){
             List<OrderOutput> orderOutputs = new ArrayList<>();
             System.out.println("YES");
             for(Optional<OrderClass> optionalOrderClass : orderRepository.findBybuyer(user)){
@@ -42,7 +45,8 @@ public class OrderService {
                 OrderOutput orderOutput = new OrderOutput(order);
                 orderOutputs.add(orderOutput);
             }
-            return orderOutputs;
+            return orderOutputs;}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized!!");
 
     }
 }

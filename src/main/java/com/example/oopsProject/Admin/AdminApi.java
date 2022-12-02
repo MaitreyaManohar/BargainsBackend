@@ -5,10 +5,15 @@ import com.example.oopsProject.Orders.OrderService;
 import com.example.oopsProject.OutputClasses.UserOutput;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserService;
+import com.example.oopsProject.UserClass.addUserClass;
+import com.example.oopsProject.UserClass.removeUser;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.rsocket.context.LocalRSocketServerPort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -26,30 +31,54 @@ public class AdminApi {
         this.orderService = orderService;
     }
 
+    @PostMapping("getusers")
+    public List<UserOutput> getUsers(@RequestBody addUserClass addUserClass){
+        return userService.getUsers(addUserClass.getId());
+    }
+    @PostMapping(path = "/getuser")
+    public UserOutput getUser(@RequestBody getOrdersClass getOrdersClass){
+        return userService.adminGetUser(getOrdersClass.getId(), getOrdersClass.getRequesterId());
+    }
+    @PostMapping("/getnonapprovemanagers")
+    public List<UserOutput> nonapproveManagers(@RequestBody getOrdersClass getOrdersClass){
+        return userService.approveManagers(getOrdersClass.getRequesterId());
+    }
+
+
+    @PostMapping("/approvemanager")
+    public ResponseEntity<?> approveManager(@RequestBody getOrdersClass getOrdersClass){
+        return userService.approveManager(getOrdersClass.getId(),getOrdersClass.getRequesterId());
+    }
+
+    @DeleteMapping("/removeuser")
+    public ResponseEntity<?> removeUser(@RequestBody removeUser removeUser){
+        return userService.removeUser(removeUser.getSenderid(),removeUser.getUserid());
+    }
+
+    @PostMapping("/getapprovedmanagers")
+    public List<UserOutput> approveManagers(@RequestBody addUserClass addUserClass){
+        return userService.approvedManagers(addUserClass.getId());
+    }
+
     @PostMapping("/itemsoldat")
     public List<Optional<OrderClass>> getItemSoldAtReport(@RequestBody getOrdersClass getOrdersClass){
-        UserOutput user = userService.getUser(getOrdersClass.getId());
-        List<Optional<OrderClass>> list;
-        if(user.getRole() == Role.ADMIN){
-            return reportServiceLayer.getOrdersByDate(getOrdersClass.getDate());
-        }
-        return null;
+
+
+        return reportServiceLayer.getOrdersByDate(getOrdersClass.getDate(),getOrdersClass.getRequesterId());
+
     }
     @PostMapping("/customerhistory")
     public List<Optional<OrderClass>> getCustomerHistory(@RequestBody getOrdersClass getOrdersClass){
         LocalDate lastDate = getOrdersClass.getDate().plusDays(30);
-        UserOutput user = userService.getUser(getOrdersClass.getRequesterId());
-        if(user.getRole() == Role.CUSTOMER || user.getRole() == Role.ADMIN){
-            return reportServiceLayer.getCustomerHistory(getOrdersClass.getId(),lastDate);
-        }
-        return null;
+
+
+        return reportServiceLayer.getCustomerHistory(getOrdersClass.getId(),lastDate);
+
     }
     @PostMapping("/itemstatus")
     public List<ItemStatus> getItemStatus(@RequestBody getOrdersClass getOrdersClass){
-        UserOutput user = userService.getUser(getOrdersClass.getRequesterId());
-        if(user.getRole() == Role.ADMIN){
-            return reportServiceLayer.getItemStatus();
-        }
-        return null;
+
+        return reportServiceLayer.getItemStatus(getOrdersClass.getRequesterId());
+
     }
 }

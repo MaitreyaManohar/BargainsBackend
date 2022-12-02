@@ -46,7 +46,7 @@ public class CartService extends EmailService {
     @Transactional
     public ResponseEntity<?> addToCart(long customerid, long itemid, int qtybought){
         System.out.println(userRepository.findById(customerid).get().getRole());
-        if(userRepository.findById(customerid).get().getRole().equals(Role.CUSTOMER)){
+        if(userRepository.findById(customerid).get().getRole().equals(Role.CUSTOMER) && userRepository.findById(customerid).get().isLoggedin()){
             System.out.println("NOT CUSTOMER");
         List<Optional<Cart>> users = cartRepository.findByuserClass(userRepository.findById(customerid).get());
         boolean itemIsAlreadyPresent = false;
@@ -69,7 +69,7 @@ public class CartService extends EmailService {
 
     @Transactional
     public List<Cart> getCartById(long id) {
-        if(userRepository.findById(id).get().getRole().equals(Role.CUSTOMER)){
+        if(userRepository.findById(id).get().getRole().equals(Role.CUSTOMER) && userRepository.findById(id).get().isLoggedin()){
         UserClass user = userRepository.findById(id).get();
         List<Cart> cartitems = new ArrayList<>();
         for(Optional<Cart> cart : cartRepository.findByuserClass(user)){
@@ -84,7 +84,7 @@ public class CartService extends EmailService {
     }
     @Transactional
     public ResponseEntity<?> buyFromCart(long customerid) {
-        if(userRepository.findById(customerid).get().getRole().equals(Role.CUSTOMER)){
+        if(userRepository.findById(customerid).get().getRole().equals(Role.CUSTOMER) && userRepository.findById(customerid).get().isLoggedin()){
         List<Optional<Cart>> cartList = cartRepository.findByuserClass(userRepository.findById(customerid).get());
         System.out.println("Cart size is "+cartList.size());
         int total = 0;

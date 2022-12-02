@@ -2,13 +2,19 @@ package com.example.oopsProject.Images;
 
 import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Items.ItemRepository;
+import com.example.oopsProject.UserClass.Role;
+import com.example.oopsProject.UserClass.UserClass;
+import com.example.oopsProject.UserClass.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.awt.*;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Optional;
 
 @Service
@@ -16,15 +22,18 @@ public class StorageService {
     private StorageRepository storageRepository;
     private ItemRepository itemRepository;
 
+    private UserRepository userRepository;
     @Autowired
-    public StorageService(StorageRepository storageRepository, ItemRepository itemRepository) {
+    public StorageService(StorageRepository storageRepository, ItemRepository itemRepository,UserRepository userRepository) {
         this.storageRepository = storageRepository;
         this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
     }
 
-    public String uploadImage(MultipartFile file, Long itemid) throws IOException {
+    public String uploadImage(MultipartFile file, Long itemid, Long requesterId) throws IOException {
         ItemClass item = itemRepository.findById(itemid).get();
-
+        UserClass manager = userRepository.findById(requesterId).get();
+        if(manager.isLoggedin() && manager.getRole().equals(Role.MANAGER)){
         if(item.getImage()!=null) {
             ImageData imagecheck = storageRepository.findByItem(item).get();
             imagecheck.setImageData(file.getBytes());
@@ -48,8 +57,9 @@ public class StorageService {
         if(image!=null){
             return "file successfully uploaded!" +file.getOriginalFilename();
         }
-        return null;
-        }
+        else return null;
+        }}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"UnauthorizedToUpload");
 
     }
 

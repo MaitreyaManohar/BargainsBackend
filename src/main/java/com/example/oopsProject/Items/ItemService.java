@@ -29,7 +29,9 @@ public class ItemService {
         this.userRepository = userRepository;
     }
 
-    public List<ProductOutput> getItems() {
+    public List<ProductOutput> getItems(long id) {
+        UserClass user = userRepository.findById(id).get();
+        if((user.getRole().equals(Role.ADMIN) || user.getRole().equals(Role.MANAGER)) && user.isLoggedin()){
         List<ProductOutput> productOutputs = new ArrayList<>();
         for(ItemClass item:itemRepository.findAll()){
 
@@ -38,12 +40,13 @@ public class ItemService {
                     ,item.getImage(),item.getPrice(), item.getDeliveryWithin(), item.getOffer(),item.getOfferValidTill(),item.getDateAdded());
             productOutputs.add(productOutput);
         }
-        return productOutputs;
+        return productOutputs;}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access!");
     }
 
     public ResponseEntity<?> addItem(addItemClass additem) {
         UserClass buyer = userRepository.findById(additem.getUser_id()).get();
-        if(buyer.getRole().equals(Role.MANAGER)){
+        if(buyer.getRole().equals(Role.MANAGER) && buyer.isLoggedin()){
         ItemClass item = new ItemClass(additem.getItemName(),true
                 ,additem.getQty(),additem.getCategory(), additem.getPrice(), additem.getDeliveryWithin(),
                 additem.getOffer(),additem.getOfferValidTill(),additem.getDateAdded());
@@ -116,7 +119,7 @@ public class ItemService {
 
     @Transactional
     public ResponseEntity<?> deleteItem(long userid, long productid) {
-        if(userRepository.findById(userid).get().getRole().equals(Role.MANAGER)){
+        if((userRepository.findById(userid).get().getRole().equals(Role.MANAGER) || userRepository.findById(userid).get().getRole().equals(Role.ADMIN)) && userRepository.findById(userid).get().isLoggedin()){
             ItemClass item = itemRepository.findById(productid).get();
             itemRepository.delete(item);
             return new ResponseEntity<>("SUCCESS",HttpStatus.OK);

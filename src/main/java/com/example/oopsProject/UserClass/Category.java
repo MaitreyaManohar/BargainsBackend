@@ -1,9 +1,10 @@
 package com.example.oopsProject.UserClass;
 
 public enum Category {
-    EDUCATION,
+    TECHNOLOGY,
     GROCERIES,
     FASHION,
+    HEALTHCARE,
     MISCELLANEOUS
 
 }

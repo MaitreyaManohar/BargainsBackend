@@ -52,15 +52,12 @@ public class UserController {
         this.emailService = emailService;
     }
 
-    @GetMapping("admin/getusers")
-    public List<UserOutput> getUsers(){
-        return userService.getUsers();
-    }
 
 
-    @GetMapping("admin/items")
-    public List<ProductOutput> getItems(){
-        return itemService.getItems();
+
+    @PostMapping("/items")
+    public List<ProductOutput> getItems(@RequestBody addUserClass addUserClass){
+        return itemService.getItems(addUserClass.getId());
     }
 
     @GetMapping("customer/getitem/{itemid}")
@@ -69,10 +66,7 @@ public class UserController {
     }
 
 
-    @GetMapping(path = "admin/getuser/{id}")
-    public UserOutput getUser(@PathVariable("id") long id){
-        return userService.getUser(id);
-    }
+
 
     @GetMapping(path = "customer/getcartbyid/{id}")
     public Optional<Cart> getcartByCartid(@PathVariable("id") long id){
@@ -94,16 +88,22 @@ public class UserController {
 
 
     @PostMapping(path = "/signup")
-    public void addUser(@RequestBody addUserClass userClass){
-        String s = userService.addUser(userClass);
-        // if(s.equals("SUCCESS")){
-        //     emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
-        // }
+    public long addUser(@RequestBody addUserClass userClass){
+        long l = userService.addUser(userClass);
+        if(l!=0 && userClass.getRole().equals(Role.CUSTOMER)){
+            emailService.sendSimpleMail(new EmailDetails(userClass.getEmail(),"Your account for Bargains has been created successfully!","ACCOUNT CREATED!!"));
+        }
+        return l;
     }
 
     @PostMapping(path = "/modifyuser")
-    public void modifyUser(@RequestBody addUserClass userClass){
-        userService.modifyUser(userClass);
+    public ResponseEntity<?> modifyUser(@RequestBody addUserClass userClass){
+        return userService.modifyUser(userClass);
+    }
+
+    @PostMapping(path = "/logout")
+    public ResponseEntity<?> logout(@RequestBody addUserClass addUserClass){
+        return userService.logout(addUserClass.getId());
     }
 
     @PostMapping(path = "/customer/addtocart")
@@ -134,12 +134,12 @@ public class UserController {
         return cartService.buyFromCart(userClass.getUser_id());
     }
 
-    @PostMapping("/manager/deleteItem")
+    @PostMapping("/deleteItem")
     public ResponseEntity<?> deleteItem(@RequestBody addToCartClass deleteClass){
         return itemService.deleteItem(deleteClass.getUserid(),deleteClass.getProductid());
     }
 
-    @PatchMapping("/manager/modifyitem")
+    @PatchMapping("/modifyitem")
     public ResponseEntity<?> modifyItem(@RequestBody ItemClass item){
         return itemService.modifyItem(item);
     }
@@ -155,9 +155,9 @@ public class UserController {
         return eWalletService.getBalance(userClass.getId());
     }
     @PostMapping("/manager/uploadimage")
-    public ResponseEntity<?> uploadImage(@RequestParam("image")MultipartFile file,@RequestParam("itemid") Long itemid) throws IOException{
+    public ResponseEntity<?> uploadImage(@RequestParam("image")MultipartFile file,@RequestParam("itemid") Long itemid,@RequestParam("requesterId") Long requesterId) throws IOException{
         System.out.println("THIS IS THE ITEMID"+itemid.getClass());
-        String uploadImage = imageService.uploadImage(file,itemid);
+        String uploadImage = imageService.uploadImage(file,itemid,requesterId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadImage);
     }
@@ -165,10 +165,7 @@ public class UserController {
 
 
 
-    @DeleteMapping("/admin/removeuser")
-    public ResponseEntity<?> removeUser(@RequestBody removeUser removeUser){
-        return userService.removeUser(removeUser.getSenderid(),removeUser.getUserid());
-    }
+
 
 
     @PostMapping("/customer/deletefromcart")
