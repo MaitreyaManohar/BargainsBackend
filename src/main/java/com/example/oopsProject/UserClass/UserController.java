@@ -168,7 +168,7 @@ public class UserController {
     }
 
 
-    @GetMapping(path = "/ewallet/getbalance")
+    @PostMapping(path = "/ewallet/getbalance")
     public Ewallet getBankBalance(@RequestBody UserClass userClass){
         return eWalletService.getBalance(userClass.getId());
     }
