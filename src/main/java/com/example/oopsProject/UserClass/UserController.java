@@ -84,9 +84,9 @@ public class UserController {
     }
 
 
-    @GetMapping(path = "customer/getpastorders/{customerid}")
-    public List<OrderOutput> getPastOrders(@PathVariable("customerid") long customerId){
-        return orderService.getPastOrders(customerId);
+    @PostMapping(path = "customer/getpastorders")
+    public List<OrderOutput> getPastOrders(@RequestBody addUserClass addUserClass){
+        return orderService.getPastOrders(addUserClass.getId());
     }
 
     @PostMapping(path = "customer/getcart")
