@@ -93,8 +93,12 @@ public class ItemService extends EmailService {
 
 
     public ResponseEntity<?> modifyItem(ItemClass item) {
-        itemRepository.save(item);
-        return new ResponseEntity<>("SUCCESS",HttpStatus.OK);
+        ItemClass itemfound = itemRepository.findById(item.getItemId()).get();
+        if(itemfound!=null){
+            itemRepository.save(item);
+            return new ResponseEntity<>("SUCCESS",HttpStatus.OK);
+        }
+        else return new ResponseEntity<>("Product already exists",HttpStatus.BAD_REQUEST);
     }
 
     public ProductOutput getItem(long itemid) {
