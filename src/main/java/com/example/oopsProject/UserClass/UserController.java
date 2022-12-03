@@ -158,7 +158,7 @@ public class UserController {
     }
 
     @PatchMapping("/modifyitem")
-    public ResponseEntity<?> modifyItem(@RequestBody ItemClass item){
+    public ResponseEntity<?> modifyItem(@RequestBody modifyItemClass item){
         return itemService.modifyItem(item);
     }
 

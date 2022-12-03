@@ -9,6 +9,7 @@ import com.example.oopsProject.Orders.OrderRepository;
 import com.example.oopsProject.OutputClasses.ProductOutput;
 import com.example.oopsProject.UserClass.*;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,13 +93,20 @@ public class ItemService extends EmailService {
 
 
 
-    public ResponseEntity<?> modifyItem(ItemClass item) {
-        ItemClass itemfound = itemRepository.findById(item.getItemId()).get();
+    public ResponseEntity<?> modifyItem(modifyItemClass addItemClass) {
+        ItemClass itemfound = itemRepository.findById(addItemClass.getItemId()).get();
+        UserClass userClass = userRepository.findById(addItemClass.getUser_id()).get();
+        if((userClass.getRole().equals(Role.MANAGER) || userClass.getRole().equals(Role.ADMIN)) && userClass.isLoggedin()){
         if(itemfound!=null){
-            itemRepository.save(item);
+            itemfound.setQty(addItemClass.getQty());
+            itemfound.setPrice(addItemClass.getPrice());
+            itemfound.setItemName(addItemClass.getItemName());
+            itemfound.setOffer(addItemClass.getOffer());
+            itemRepository.save(itemfound);
             return new ResponseEntity<>("SUCCESS",HttpStatus.OK);
         }
-        else return new ResponseEntity<>("Product already exists",HttpStatus.BAD_REQUEST);
+        else return new ResponseEntity<>("Product already exists",HttpStatus.BAD_REQUEST);}
+        else return new ResponseEntity<>("Unauthorized Access",HttpStatus.BAD_REQUEST);
     }
 
     public ProductOutput getItem(long itemid) {
