@@ -6,6 +6,7 @@ import com.example.oopsProject.UserClass.Category;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,12 +27,12 @@ public class ItemClass {
     private int qty;
     private Category category;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<OrderClass> orderClasses;
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "item")
+    private List<OrderClass> orderClasses;
 
 
     @Lob
-    @OneToOne(cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "image_id")
     private ImageData image;
     private int price;
