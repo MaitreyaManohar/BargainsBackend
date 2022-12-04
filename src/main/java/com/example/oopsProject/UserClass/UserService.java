@@ -124,23 +124,25 @@ public class UserService extends EmailService {
         }
     }
 
+    @Transactional
     public ResponseEntity<?> removeUser(long senderid,String email) {
         UserClass sender = userRepository.findById(senderid).get();
         UserClass toDelete = userRepository.findByEmail(email).get();
         if(sender.getRole().equals(Role.ADMIN) && sender.isLoggedin()){
             if(toDelete.getRole().equals(Role.MANAGER) && toDelete.isApproved()==false){
-                sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains application for manager has been rejected. Sorry! ","Application to Bargains"));
                 userRepository.deleteByEmail(email);
+                sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains application for manager has been rejected. Sorry! ","Application to Bargains"));
                 return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
             }
             else{
+                userRepository.deleteByEmail(email);
                 sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains account has been removed by the admin. ","Bargains Account Removal"));
-            userRepository.deleteByEmail(email);
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);}
         }
         else return new ResponseEntity<>("BADREQUEST", HttpStatus.BAD_REQUEST);
     }
 
+    @Transactional
     public ResponseEntity<?> modifyUser(addUserClass userClass) {
         UserClass user = userRepository.findById(userClass.getId()).get();
         System.out.println(user.getName());
