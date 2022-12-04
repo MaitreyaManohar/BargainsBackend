@@ -68,11 +68,11 @@ public class AdminApi {
 
     }
     @PostMapping("/customerhistory")
-    public List<Optional<OrderClass>> getCustomerHistory(@RequestBody getOrdersClass getOrdersClass){
-        LocalDate lastDate = getOrdersClass.getDate().plusDays(30);
+    public List<OrderOutput> getCustomerHistory(@RequestBody getOrdersClass getOrdersClass){
+        LocalDate lastDate = LocalDate.now().plusDays(30);
 
 
-        return reportServiceLayer.getCustomerHistory(getOrdersClass.getId(),lastDate);
+        return reportServiceLayer.getCustomerHistory(getOrdersClass.getEmail(),lastDate);
 
     }
     @PostMapping("/itemstatus")

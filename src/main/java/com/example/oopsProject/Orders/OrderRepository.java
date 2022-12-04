@@ -14,6 +14,6 @@ public interface OrderRepository extends JpaRepository<OrderClass,Long> {
     List<Optional<OrderClass>> findBybuyer(UserClass user);
 
     List<Optional<OrderClass>> findBysoldAt(LocalDate date);
-    @Query("select o FROM OrderClass o WHERE o.soldAt < ?2 AND o.buyer.id=?1")
-    List<Optional<OrderClass>> getCustomerHistory(long id, LocalDate lastDate);
+    @Query("select o FROM OrderClass o WHERE o.soldAt < ?2 AND o.buyer.email=?1")
+    List<Optional<OrderClass>> getCustomerHistory(String email, LocalDate lastDate);
 }

@@ -120,7 +120,7 @@ public class UserService extends EmailService {
         }
         else{
             System.out.println("NOT OK");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User Does not exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email/Password is incorrect!");
         }
     }
 

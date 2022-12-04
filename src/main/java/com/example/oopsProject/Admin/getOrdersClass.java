@@ -9,17 +9,27 @@ public class getOrdersClass {
     private long requesterId;
     private LocalDate date;
 
+    private String email;
     public getOrdersClass() {
     }
 
-    public getOrdersClass(long id, long requesterId, LocalDate date) {
+    public getOrdersClass(long id, long requesterId, LocalDate date,String email) {
         this.id = id;
+        this.email = email;
         this.date = date;
         this.requesterId = requesterId;
     }
     public getOrdersClass(long requesterId,LocalDate date){
         this.requesterId = requesterId;
         this.date = date;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public long getRequesterId() {

@@ -55,12 +55,22 @@ public class ReportServiceLayer {
     }
 
     @Transactional
-    public List<Optional<OrderClass>> getCustomerHistory(long id, LocalDate lastDate) {
-        Optional<UserClass> userClass = userRepository.findById(id);
+    public List<OrderOutput> getCustomerHistory(String email, LocalDate lastDate) {
+        Optional<UserClass> userClass = userRepository.findByEmail(email);
         if(userClass.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User does not exist!!");
         UserClass user = userClass.get();
+        List<OrderOutput> orderOutputs = new ArrayList<>();
         if((user.getRole().equals(Role.ADMIN)|| user.getRole().equals(Role.CUSTOMER)) && user.isLoggedin()){
-        return orderRepository.getCustomerHistory(id,lastDate);}
+            for(Optional<OrderClass> orderClassOptional : orderRepository.getCustomerHistory(email,lastDate)){
+                OrderClass order = orderClassOptional.get();
+                OrderOutput neworder = new OrderOutput(order);
+                ProductOutput productOutput = neworder.getItem();
+                productOutput.setImage(null);
+                neworder.setItem(productOutput);
+                orderOutputs.add(neworder);
+            }
+            return orderOutputs;
+        }
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized");
     }
 
