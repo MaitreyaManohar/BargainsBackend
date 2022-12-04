@@ -173,10 +173,10 @@ public class UserService extends EmailService {
 
     }
 
-    public ResponseEntity<?> approveManager(long id,long requesterid) {
+    public ResponseEntity<?> approveManager(String email,long requesterid) {
         UserClass admin = userRepository.findById(requesterid).get();
         if(admin.isLoggedin() && admin.getRole().equals(Role.ADMIN)){
-        UserClass userClass = userRepository.findById(id).get();
+        UserClass userClass = userRepository.findByEmail(email).get();
         if(userClass.isApproved()==false && userClass.getRole().equals(Role.MANAGER)){
         userClass.setApproved(true);
         userRepository.save(userClass);

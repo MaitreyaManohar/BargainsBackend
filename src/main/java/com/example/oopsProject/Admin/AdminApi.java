@@ -44,8 +44,8 @@ public class AdminApi {
 
 
     @PostMapping("/approvemanager")
-    public ResponseEntity<?> approveManager(@RequestBody getOrdersClass getOrdersClass){
-        return userService.approveManager(getOrdersClass.getId(),getOrdersClass.getRequesterId());
+    public ResponseEntity<?> approveManager(@RequestBody removeUser removeUser){
+        return userService.approveManager(removeUser.getEmail(),removeUser.getSenderid());
     }
 
     @PostMapping("/removeuser")
