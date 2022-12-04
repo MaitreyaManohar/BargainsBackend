@@ -20,7 +20,7 @@ public class    addItemClass {
 
     private LocalDate offerValidTill;
 
-
+    private String description;
 
     private LocalDate dateAdded;
 
@@ -28,7 +28,7 @@ public class    addItemClass {
         this.category = category;
 
     }
-    public addItemClass(String itemName, int qty, Category category, long user_id, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded) {
+    public addItemClass(String itemName, int qty, Category category, long user_id, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded,String description) {
         this.itemName = itemName;
         this.qty = qty;
         this.category = category;
@@ -38,7 +38,16 @@ public class    addItemClass {
         this.offer = offer;
         this.offerValidTill = offerValidTill;
         this.dateAdded = dateAdded;
+        this.description = description;
 
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getItemName() {

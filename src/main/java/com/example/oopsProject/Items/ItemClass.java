@@ -36,6 +36,8 @@ public class ItemClass {
     @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "image_id")
     private ImageData image;
+
+    private String description;
     private int price;
     private int deliveryWithin;
     private int offer=0;
@@ -55,7 +57,7 @@ public class ItemClass {
 
     }
 
-    public ItemClass(String itemName, boolean inProduction, int qty, Category category, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded) {
+    public ItemClass(String itemName, boolean inProduction, int qty, Category category, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded,String description) {
         this.itemName = itemName;
         this.inProduction = inProduction;
         this.qty = qty;
@@ -65,15 +67,17 @@ public class ItemClass {
         this.offer = offer;
         this.offerValidTill = offerValidTill;
         this.dateAdded = dateAdded;
+        this.description = description;
     }
 
-    public ItemClass(String itemName, int qty, Category category, ImageData image, int price, int deliveryWithin) {
+    public ItemClass(String itemName, int qty, Category category, ImageData image, int price, int deliveryWithin,String description) {
         this.itemName = itemName;
         this.qty = qty;
         this.category = category;
         this.image = image;
         this.price = price;
         this.deliveryWithin = deliveryWithin;
+        this.description = description;
     }
 
     public ItemClass(String itemName, int qty, Category category, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded) {
@@ -98,6 +102,14 @@ public class ItemClass {
         this.offer = offer;
         this.offerValidTill = offerValidTill;
         this.dateAdded = dateAdded;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public long getItemId() {

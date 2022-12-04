@@ -46,7 +46,7 @@ public class ItemService extends EmailService {
 
 
             ProductOutput productOutput = new ProductOutput(item.getItemId(),item.getItemName(),item.isInProduction(),item.getQty(),item.getCategory()
-                    ,item.getImage(),item.getPrice(), item.getDeliveryWithin(), item.getOffer(),item.getOfferValidTill(),item.getDateAdded());
+                    ,item.getImage(),item.getPrice(), item.getDeliveryWithin(), item.getOffer(),item.getOfferValidTill(),item.getDateAdded(),item.getDescription());
             productOutputs.add(productOutput);
         }
         return productOutputs;}
@@ -58,7 +58,7 @@ public class ItemService extends EmailService {
         if((buyer.getRole().equals(Role.MANAGER) || buyer.getRole().equals(Role.ADMIN)) && buyer.isLoggedin()){
         ItemClass item = new ItemClass(additem.getItemName(),true
                 ,additem.getQty(),additem.getCategory(), additem.getPrice(), additem.getDeliveryWithin(),
-                additem.getOffer(),additem.getOfferValidTill(),additem.getDateAdded());
+                additem.getOffer(),additem.getOfferValidTill(),additem.getDateAdded(),additem.getDescription());
         item.setDateAdded(LocalDate.now());
         itemRepository.save(item);
             return item.getItemId();
@@ -113,7 +113,7 @@ public class ItemService extends EmailService {
         ItemClass item = itemRepository.findById(itemid).get();
 
         ProductOutput productOutput = new ProductOutput(item.getItemId(),item.getItemName(),item.isInProduction(),item.getQty(),item.getCategory()
-                ,item.getImage(),item.getPrice(), item.getDeliveryWithin(), item.getOffer(),item.getOfferValidTill(),item.getDateAdded());
+                ,item.getImage(),item.getPrice(), item.getDeliveryWithin(), item.getOffer(),item.getOfferValidTill(),item.getDateAdded(),item.getDescription());
 
         return productOutput;
     }
