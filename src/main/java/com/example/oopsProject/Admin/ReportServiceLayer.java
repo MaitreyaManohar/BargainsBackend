@@ -9,6 +9,7 @@ import com.example.oopsProject.OutputClasses.ProductOutput;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
 import com.example.oopsProject.UserClass.UserRepository;
+import org.apache.catalina.User;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,8 @@ public class ReportServiceLayer {
     }
     @Transactional
     public List<OrderOutput> getOrdersByDate(LocalDate date, long id){
+        Optional<UserClass> optionalUserClass = userRepository.findById(id);
+        if(optionalUserClass.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User does not Exist! ");
         UserClass user = userRepository.findById(id).get();
         List<OrderOutput> orderOutputs = new ArrayList<>();
         List<Optional<OrderClass>> orders = orderRepository.findBysoldAt(date);
@@ -53,7 +56,9 @@ public class ReportServiceLayer {
 
     @Transactional
     public List<Optional<OrderClass>> getCustomerHistory(long id, LocalDate lastDate) {
-        UserClass user = userRepository.findById(id).get();
+        Optional<UserClass> userClass = userRepository.findById(id);
+        if(userClass.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User does not exist!!");
+        UserClass user = userClass.get();
         if((user.getRole().equals(Role.ADMIN)|| user.getRole().equals(Role.CUSTOMER)) && user.isLoggedin()){
         return orderRepository.getCustomerHistory(id,lastDate);}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized");
@@ -61,6 +66,8 @@ public class ReportServiceLayer {
 
     @Transactional
     public List<ItemStatus> getItemStatus(long id) {
+        Optional<UserClass> userClass = userRepository.findById(id);
+        if(userClass.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User does not exist!!");
         UserClass user = userRepository.findById(id).get();
         if (user.isLoggedin() && user.getRole().equals(Role.ADMIN)) {
             List<ItemClass> list = itemRepository.findAll();

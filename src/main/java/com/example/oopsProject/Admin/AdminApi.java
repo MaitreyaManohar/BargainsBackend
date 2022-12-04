@@ -48,7 +48,7 @@ public class AdminApi {
         return userService.approveManager(getOrdersClass.getId(),getOrdersClass.getRequesterId());
     }
 
-    @DeleteMapping("/removeuser")
+    @PostMapping("/removeuser")
     public ResponseEntity<?> removeUser(@RequestBody removeUser removeUser){
         return userService.removeUser(removeUser.getSenderid(),removeUser.getEmail());
     }
