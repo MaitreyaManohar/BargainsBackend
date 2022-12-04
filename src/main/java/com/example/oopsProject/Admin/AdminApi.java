@@ -2,6 +2,7 @@ package com.example.oopsProject.Admin;
 
 import com.example.oopsProject.Orders.OrderClass;
 import com.example.oopsProject.Orders.OrderService;
+import com.example.oopsProject.OutputClasses.OrderOutput;
 import com.example.oopsProject.OutputClasses.UserOutput;
 import com.example.oopsProject.UserClass.UserService;
 import com.example.oopsProject.UserClass.addUserClass;
@@ -49,7 +50,7 @@ public class AdminApi {
 
     @DeleteMapping("/removeuser")
     public ResponseEntity<?> removeUser(@RequestBody removeUser removeUser){
-        return userService.removeUser(removeUser.getSenderid(),removeUser.getUserid());
+        return userService.removeUser(removeUser.getSenderid(),removeUser.getEmail());
     }
 
     @PostMapping("/getcustomers")
@@ -62,9 +63,7 @@ public class AdminApi {
     }
 
     @PostMapping("/itemsoldat")
-    public List<Optional<OrderClass>> getItemSoldAtReport(@RequestBody getOrdersClass getOrdersClass){
-
-
+    public List<OrderOutput> getItemSoldAtReport(@RequestBody getOrdersClass getOrdersClass){
         return reportServiceLayer.getOrdersByDate(getOrdersClass.getDate(),getOrdersClass.getRequesterId());
 
     }

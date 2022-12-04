@@ -106,15 +106,16 @@ public class UserService extends EmailService {
     }
 
     public addUserClass login(String email,String password) {
-        UserClass user = userRepository.findByEmail(email).get();
-        if(user.getRole().equals(Role.MANAGER) && user.isApproved()==false){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Status has not been approved!");
+        Optional<UserClass> user = userRepository.findByEmail(email);
+        if(user.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Account does not exist! Please create an account! ");
+        else if(user.get().getRole().equals(Role.MANAGER) && user.get().isApproved()==false){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Application has not been approved!");
         }
-        else if(user.getPassword().equals(encoder.encode(password)) && user!=null){
-            user.setLoggedin(true);
-            userRepository.save(user);
+        else if(user.get().getPassword().equals(encoder.encode(password)) && user!=null){
+            user.get().setLoggedin(true);
+            userRepository.save(user.get());
             System.out.println("OK");
-            return new addUserClass(user);
+            return new addUserClass(user.get());
 
         }
         else{
@@ -123,10 +124,19 @@ public class UserService extends EmailService {
         }
     }
 
-    public ResponseEntity<?> removeUser(long senderid,long userid) {
-        if(userRepository.findById(senderid).get().getRole().equals(Role.ADMIN)){
-            userRepository.deleteById(userid);
-            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+    public ResponseEntity<?> removeUser(long senderid,String email) {
+        UserClass sender = userRepository.findById(senderid).get();
+        UserClass toDelete = userRepository.findByEmail(email).get();
+        if(sender.getRole().equals(Role.ADMIN) && sender.isLoggedin()){
+            if(toDelete.getRole().equals(Role.MANAGER) && toDelete.isApproved()==false){
+                sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains application for manager has been rejected. Sorry! ","Application to Bargains"));
+                userRepository.deleteByEmail(email);
+                return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+            }
+            else{
+                sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains account has been removed by the admin. ","Bargains Account Removal"));
+            userRepository.deleteByEmail(email);
+            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);}
         }
         else return new ResponseEntity<>("BADREQUEST", HttpStatus.BAD_REQUEST);
     }

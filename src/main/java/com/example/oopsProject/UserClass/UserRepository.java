@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<UserClass,Long> {
     List<Optional<UserClass>> findByApprovedAndRole(boolean b, Role manager);
 
     List<Optional<UserClass>> findByRole(Role customer);
+
+    void deleteByEmail(String email);
 }

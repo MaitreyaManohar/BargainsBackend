@@ -1,15 +1,15 @@
 package com.example.oopsProject.UserClass;
 
 public class removeUser {
-    private long userid;
+    private String email;
     private long senderid;
 
-    public long getUserid() {
-        return userid;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserid(long userid) {
-        this.userid = userid;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public long getSenderid() {

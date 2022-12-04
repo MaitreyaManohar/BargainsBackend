@@ -4,9 +4,12 @@ import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Items.ItemRepository;
 import com.example.oopsProject.Orders.OrderClass;
 import com.example.oopsProject.Orders.OrderRepository;
+import com.example.oopsProject.OutputClasses.OrderOutput;
+import com.example.oopsProject.OutputClasses.ProductOutput;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
 import com.example.oopsProject.UserClass.UserRepository;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,10 +34,20 @@ public class ReportServiceLayer {
         this.userRepository = userRepository;
     }
     @Transactional
-    public List<Optional<OrderClass>> getOrdersByDate(LocalDate date, long id){
+    public List<OrderOutput> getOrdersByDate(LocalDate date, long id){
         UserClass user = userRepository.findById(id).get();
+        List<OrderOutput> orderOutputs = new ArrayList<>();
+        List<Optional<OrderClass>> orders = orderRepository.findBysoldAt(date);
         if(user.isLoggedin() && user.getRole().equals(Role.ADMIN)){
-        return orderRepository.findBysoldAt(date);}
+            for(Optional<OrderClass> orderClassOptional: orders){
+                OrderClass order = orderClassOptional.get();
+                OrderOutput neworder = new OrderOutput(order);
+                ProductOutput productOutput = neworder.getItem();
+                productOutput.setImage(null);
+                neworder.setItem(productOutput);
+                orderOutputs.add(neworder);
+            }
+        return orderOutputs;}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access");
     }
 
