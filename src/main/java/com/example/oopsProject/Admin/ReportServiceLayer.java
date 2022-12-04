@@ -46,6 +46,7 @@ public class ReportServiceLayer {
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized");
     }
 
+    @Transactional
     public List<ItemStatus> getItemStatus(long id) {
         UserClass user = userRepository.findById(id).get();
         if (user.isLoggedin() && user.getRole().equals(Role.ADMIN)) {

@@ -52,9 +52,13 @@ public class AdminApi {
         return userService.removeUser(removeUser.getSenderid(),removeUser.getUserid());
     }
 
+    @PostMapping("/getcustomers")
+    public List<UserOutput> getCustomers(@RequestBody getOrdersClass getOrdersClass){
+        return userService.getCustomers(getOrdersClass.getRequesterId());
+    }
     @PostMapping("/getapprovedmanagers")
-    public List<UserOutput> approveManagers(@RequestBody addUserClass addUserClass){
-        return userService.approvedManagers(addUserClass.getId());
+    public List<UserOutput> approveManagers(@RequestBody getOrdersClass getOrdersClass){
+        return userService.approvedManagers(getOrdersClass.getRequesterId());
     }
 
     @PostMapping("/itemsoldat")

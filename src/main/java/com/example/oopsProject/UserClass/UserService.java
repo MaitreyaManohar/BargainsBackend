@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -144,6 +145,7 @@ public class UserService extends EmailService {
 
     }
 
+    @Transactional
     public List<UserOutput> approveManagers(long requesterid) {
         UserClass admin = userRepository.findById(requesterid).get();
         if((admin!=null && admin.getRole().equals(Role.ADMIN))&& admin.isLoggedin()){
@@ -173,7 +175,7 @@ public class UserService extends EmailService {
         else return new ResponseEntity<>("Error while trying to approve",HttpStatus.BAD_REQUEST);}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Admin privelages not accessible");
 }
-
+    @Transactional
     public List<UserOutput> approvedManagers(long id) {
         UserClass admin = userRepository.findById(id).get();
         if(admin.isLoggedin() && admin.getRole().equals(Role.ADMIN)){
@@ -216,5 +218,18 @@ public class UserService extends EmailService {
             return new UserOutput(user);
         }
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized Access");
+    }
+
+    public List<UserOutput> getCustomers(long requesterId) {
+        UserClass admin = userRepository.findById(requesterId).get();
+        if(admin.isLoggedin() && admin.getRole().equals(Role.ADMIN)){
+            List<Optional<UserClass>> users = userRepository.findByRole(Role.CUSTOMER);
+            List<UserOutput> userOutputs = new ArrayList<>();
+            for(Optional<UserClass> userClass : users){
+                UserClass user = userClass.get();
+                userOutputs.add(new UserOutput(user));
+            }
+            return userOutputs;}
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bad request");
     }
 }
