@@ -25,11 +25,12 @@ public class modifyItemClass {
 
         private LocalDate dateAdded;
 
+        private String description;
         public modifyItemClass(Category category){
             this.category = category;
 
         }
-        public modifyItemClass(String itemName, int qty, Category category, long user_id, int price, int deliveryWithin, int offer, LocalDate offerValidTill, long itemId, LocalDate dateAdded) {
+        public modifyItemClass(String itemName, int qty, Category category, long user_id, int price, int deliveryWithin, int offer, LocalDate offerValidTill, long itemId, LocalDate dateAdded,String description) {
             this.itemName = itemName;
             this.qty = qty;
             this.category = category;
@@ -40,8 +41,17 @@ public class modifyItemClass {
             this.offerValidTill = offerValidTill;
             this.itemId = itemId;
             this.dateAdded = dateAdded;
+            this.description = description;
 
         }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public long getItemId() {
         return itemId;
