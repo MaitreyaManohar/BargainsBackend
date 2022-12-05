@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -86,15 +87,18 @@ public class CartService extends EmailService {
     }
     @Transactional
     public ResponseEntity<?> buyFromCart(long customerid) {
-        if(userRepository.findById(customerid).get().getRole().equals(Role.CUSTOMER) && userRepository.findById(customerid).get().isLoggedin()){
-        List<Optional<Cart>> cartList = cartRepository.findByuserClass(userRepository.findById(customerid).get());
+        Optional<UserClass> userClass = userRepository.findById(customerid);
+        if(userClass.get().getRole().equals(Role.CUSTOMER) && userClass.get().isLoggedin()){
+
+            List<Optional<Cart>> cartList = cartRepository.findByuserClass(userClass.get());
         System.out.println("Cart size is "+cartList.size());
         int total = 0;
         for (int i = 0;i<cartList.size();i++) {
-            if (cartList.get(i).get().itemClass.getQty() > cartList.get(i).get().qtybought) {
+            if (cartList.get(i).get().getItemClass().getQty() > cartList.get(i).get().qtybought) {
                 total = total + cartList.get(i).get().itemClass.priceWithOffer() * cartList.get(i).get().qtybought;
 
             }
+            else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantity chosen is more than the stock!");
         }
 
         Ewallet ewallet = eWalletRepository.findByowner(userRepository.findById(customerid).get()).get();
