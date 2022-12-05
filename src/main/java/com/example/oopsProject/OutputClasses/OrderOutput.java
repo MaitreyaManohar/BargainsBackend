@@ -1,6 +1,6 @@
 package com.example.oopsProject.OutputClasses;
 
-import com.example.oopsProject.Orders.OrderClass;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshot;
 
 import java.time.LocalDate;
 
@@ -29,14 +29,14 @@ public class OrderOutput {
         this.qtyBought = qtyBought;
     }
 
-    public OrderOutput(OrderClass order){
-        this.orderid = order.getOrderid();
-        this.buyer = new UserOutput(order.getBuyer());
-        this.item = new ProductOutput(order.getItem());
-        this.soldAt = order.getSoldAt();
-        this.qtyBought = order.getQtyBought();
 
-    }
+
+   public OrderOutput(OrderSnapshot orderSnapshot){
+        this.orderid = orderSnapshot.getOrderSnapshotId();
+        this.item = new ProductOutput(orderSnapshot.getItem());
+        this.soldAt = orderSnapshot.getSoldAt();
+        this.qtyBought = orderSnapshot.getQtybought();
+   }
 
     public long getOrderid() {
         return orderid;

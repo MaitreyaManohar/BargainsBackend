@@ -4,12 +4,13 @@ import com.example.oopsProject.Ewallet.EWalletRepository;
 import com.example.oopsProject.Ewallet.Ewallet;
 import com.example.oopsProject.Mail.EmailDetails;
 import com.example.oopsProject.Mail.EmailService;
-import com.example.oopsProject.Orders.OrderClass;
-import com.example.oopsProject.Orders.OrderRepository;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshot;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshotRepository;
 import com.example.oopsProject.OutputClasses.ProductOutput;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshot;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshotRepository;
 import com.example.oopsProject.UserClass.*;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +27,17 @@ public class ItemService extends EmailService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
+    private final ProductSnapshotRepository productSnapshotRepository;
     private final EWalletRepository eWalletRepository;
+    private final OrderSnapshotRepository orderSnapshotRepository;
 
-    private final OrderRepository orderRepository;
     @Autowired
-    public ItemService(ItemRepository itemRepository, UserRepository userRepository, EWalletRepository eWalletRepository, OrderRepository orderRepository) {
+    public ItemService(ItemRepository itemRepository, UserRepository userRepository, EWalletRepository eWalletRepository, ProductSnapshotRepository productSnapshotRepository, OrderSnapshotRepository orderSnapshotRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.eWalletRepository = eWalletRepository;
-
-        this.orderRepository = orderRepository;
+        this.productSnapshotRepository = productSnapshotRepository;
+        this.orderSnapshotRepository = orderSnapshotRepository;
     }
 
     public List<ProductOutput> getItems(long id) {
@@ -60,7 +62,9 @@ public class ItemService extends EmailService {
                 ,additem.getQty(),additem.getCategory(), additem.getPrice(), additem.getDeliveryWithin(),
                 additem.getOffer(),additem.getOfferValidTill(),additem.getDateAdded(),additem.getDescription());
         item.setDateAdded(LocalDate.now());
+
         itemRepository.save(item);
+        productSnapshotRepository.save(new ProductSnapshot(item));
             return item.getItemId();
         }
         else throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"UNAUTHORIZEDACCESS");
@@ -103,6 +107,7 @@ public class ItemService extends EmailService {
             itemfound.setItemName(addItemClass.getItemName());
             itemfound.setOffer(addItemClass.getOffer());
             itemfound.setDescription(addItemClass.getDescription());
+            productSnapshotRepository.save(new ProductSnapshot(itemfound));
             itemRepository.save(itemfound);
             return new ResponseEntity<>("SUCCESS",HttpStatus.OK);
         }
@@ -163,7 +168,13 @@ public class ItemService extends EmailService {
                 item.setQty(item.getQty()-qtybought);
                 itemRepository.save(item);
                 userRepository.save(user);
-                orderRepository.save(new OrderClass(user,item, LocalDate.now(),qtybought));
+                OrderSnapshot orderSnapshot = new OrderSnapshot();
+                orderSnapshot.setBuyerid(user.getId());
+                orderSnapshot.setQtybought(qtybought);
+                orderSnapshot.setSoldAt(LocalDate.now());
+                List<Optional<ProductSnapshot>> productSnapshot = productSnapshotRepository.findByItemId(productid);
+                orderSnapshot.setItem(productSnapshot.get(productSnapshot.size()-1).get());
+                orderSnapshotRepository.save(orderSnapshot);
                 sendSimpleMail(new EmailDetails(user.getEmail(),"ORDER SUCCESSFUL",null));
                 return new ResponseEntity<>("Successfully Bought!",HttpStatus.OK);
             }

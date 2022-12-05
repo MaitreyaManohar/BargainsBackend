@@ -1,50 +1,55 @@
-package com.example.oopsProject.OutputClasses;
+package com.example.oopsProject.ProductSnapshot;
 
-import com.example.oopsProject.Images.ImageData;
+
 import com.example.oopsProject.Items.ItemClass;
-import com.example.oopsProject.ProductSnapshot.ProductSnapshot;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshot;
 import com.example.oopsProject.UserClass.Category;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
-public class ProductOutput {
+@Entity
+@Table(name = "ProductSnapshot")
+public class ProductSnapshot {
+    @Id
+    @SequenceGenerator(
+            name = "productsnapshot_sequence",
+            sequenceName = "productsnapshot_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,generator = "productsnapshot_sequence"
+    )
+    long productsnapshotid;
+
     private long itemId;
     private String itemName;
     private boolean inProduction = true;
     private int qty;
     private Category category;
 
-    private ImageData image;
+    private byte[] imageData;
     private int price;
     private int deliveryWithin;
     private int offer;
 
     private String description;
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "item")
+    private List<OrderSnapshot> orderSnapshots;
     private LocalDate offerValidTill;
     private LocalDate dateAdded;
 
-    public ProductOutput(long itemId, String itemName, boolean inProduction, int qty, Category category, ImageData image, int price, int deliveryWithin, int offer, LocalDate offerValidTill, LocalDate dateAdded,String description) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.inProduction = inProduction;
-        this.qty = qty;
-        this.category = category;
-        this.image = image;
-        this.price = price;
-        this.deliveryWithin = deliveryWithin;
-        this.offer = offer;
-        this.offerValidTill = offerValidTill;
-        this.dateAdded = dateAdded;
-        this.description = description;
-    }
+    public ProductSnapshot(){}
 
-    public ProductOutput(ItemClass item){
+    public ProductSnapshot(ItemClass item){
         this.itemId = item.getItemId();
         this.itemName = item.getItemName();
         this.inProduction = item.isInProduction();
         this.qty = item.getQty();
         this.category = item.getCategory();
-        this.image = item.getImage();
+        this.imageData = null;;
         this.price = item.getPrice();
         this.deliveryWithin = item.getDeliveryWithin();
         this.offer = item.getOffer();
@@ -52,27 +57,28 @@ public class ProductOutput {
         this.dateAdded = item.getDateAdded();
         this.description = item.getDescription();
     }
-
-    public ProductOutput(ProductSnapshot productSnapshot){
-        this.itemId = productSnapshot.getItemId();
-        this.itemName = productSnapshot.getItemName();
-        this.inProduction = productSnapshot.isInProduction();
-        this.qty = productSnapshot.getQty();
-        this.category = productSnapshot.getCategory();
-        this.image = null;
-        this.price = productSnapshot.getPrice();
-        this.deliveryWithin = productSnapshot.getDeliveryWithin();
-        this.offer = productSnapshot.getOffer();
-        this.offerValidTill = productSnapshot.getOfferValidTill();
-        this.dateAdded = productSnapshot.getDateAdded();
-        this.description = productSnapshot.getDescription();
-    }
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
+    public ProductSnapshot(long productsnapshotid, long itemId, String itemName, boolean inProduction, int qty, Category category, byte[] imageData, int price, int deliveryWithin, int offer, String description, LocalDate offerValidTill, LocalDate dateAdded) {
+        this.productsnapshotid = productsnapshotid;
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.inProduction = inProduction;
+        this.qty = qty;
+        this.category = category;
+        this.imageData =imageData;
+        this.price = price;
+        this.deliveryWithin = deliveryWithin;
+        this.offer = offer;
         this.description = description;
+        this.offerValidTill = offerValidTill;
+        this.dateAdded = dateAdded;
+    }
+
+    public long getProductsnapshotid() {
+        return productsnapshotid;
+    }
+
+    public void setProductsnapshotid(long productsnapshotid) {
+        this.productsnapshotid = productsnapshotid;
     }
 
     public long getItemId() {
@@ -115,12 +121,12 @@ public class ProductOutput {
         this.category = category;
     }
 
-    public ImageData getImage() {
-        return image;
+    public byte[] getImageData() {
+        return imageData;
     }
 
-    public void setImage(ImageData image) {
-        this.image = image;
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
     }
 
     public int getPrice() {
@@ -145,6 +151,14 @@ public class ProductOutput {
 
     public void setOffer(int offer) {
         this.offer = offer;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDate getOfferValidTill() {

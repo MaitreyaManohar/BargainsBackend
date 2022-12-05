@@ -5,8 +5,10 @@ import com.example.oopsProject.Ewallet.Ewallet;
 import com.example.oopsProject.Items.ItemRepository;
 import com.example.oopsProject.Mail.EmailDetails;
 import com.example.oopsProject.Mail.EmailService;
-import com.example.oopsProject.Orders.OrderClass;
-import com.example.oopsProject.Orders.OrderRepository;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshot;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshotRepository;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshot;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshotRepository;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
 import com.example.oopsProject.UserClass.UserRepository;
@@ -28,15 +30,17 @@ public class CartService extends EmailService {
     UserRepository userRepository;
     ItemRepository itemRepository;
     EWalletRepository eWalletRepository;
+    private final ProductSnapshotRepository productSnapshotRepository;
+    private final OrderSnapshotRepository orderSnapshotRepository;
 
-    OrderRepository orderRepository;
     @Autowired
-    public CartService(CartRepository cartRepository, UserRepository userRepository, ItemRepository itemRepository,EWalletRepository eWalletRepository,OrderRepository orderRepository) {
+    public CartService(CartRepository cartRepository, UserRepository userRepository, ItemRepository itemRepository, EWalletRepository eWalletRepository, ProductSnapshotRepository productSnapshotRepository, OrderSnapshotRepository orderSnapshotRepository) {
         this.cartRepository = cartRepository;
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.eWalletRepository = eWalletRepository;
-        this.orderRepository = orderRepository;
+        this.productSnapshotRepository = productSnapshotRepository;
+        this.orderSnapshotRepository = orderSnapshotRepository;
     }
 
 
@@ -88,24 +92,23 @@ public class CartService extends EmailService {
         int total = 0;
         for (int i = 0;i<cartList.size();i++) {
             if (cartList.get(i).get().itemClass.getQty() > cartList.get(i).get().qtybought) {
-                System.out.println("IT IS TRUE");
                 total = total + cartList.get(i).get().itemClass.priceWithOffer() * cartList.get(i).get().qtybought;
 
             }
-            System.out.println("THIS IS I "+i);
         }
-        System.out.println("THIS IS THE TOTAL "+total);
 
         Ewallet ewallet = eWalletRepository.findByowner(userRepository.findById(customerid).get()).get();
         if (ewallet.getBalance()>total) {
-            System.out.println("AGAIN TRUE");
             ewallet.deduct(total);
-            System.out.println("THIS IS THE EWALLET TOTAL "+ewallet.getBalance());
             for (int i = 0;i<cartList.size();i++) {
                 if(cartList.get(i).get().itemClass.getQty()-cartList.get(i).get().qtybought>0){
                 cartList.get(i).get().itemClass.setQty(cartList.get(i).get().itemClass.getQty() - cartList.get(i).get().qtybought);
+//                orderRepository.save(new OrderClass(cartList.get(i).get().userClass,cartList.get(i).get().itemClass, LocalDate.now(),cartList.get(i).get().qtybought));
 
-                orderRepository.save(new OrderClass(cartList.get(i).get().userClass,cartList.get(i).get().itemClass, LocalDate.now(),cartList.get(i).get().qtybought));
+                    OrderSnapshot orderSnapshot = new OrderSnapshot(cartList.get(i).get());
+                    List<Optional<ProductSnapshot>> productSnapshot = productSnapshotRepository.findByItemId(cartList.get(i).get().getItemClass().getItemId());
+                    orderSnapshot.setItem(productSnapshot.get(productSnapshot.size()-1).get());
+                    orderSnapshotRepository.save(orderSnapshot);
                 cartRepository.deleteById(cartList.get(i).get().cartid);
                 sendSimpleMail(new EmailDetails(userRepository.findById(customerid).get().getEmail(),"ORDER SUCCESSFUL",null));
                 return new ResponseEntity<>("SUCCESSFULLY Bought",HttpStatus.OK);

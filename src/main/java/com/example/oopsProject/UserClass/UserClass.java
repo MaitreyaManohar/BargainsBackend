@@ -2,7 +2,6 @@ package com.example.oopsProject.UserClass;
 
 import com.example.oopsProject.Cart.Cart;
 import com.example.oopsProject.Ewallet.Ewallet;
-import com.example.oopsProject.Orders.OrderClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -32,8 +31,7 @@ public class UserClass {
     @Column(name="Address")
     String address;
 
-    @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderClass> orderClasses;
+
 
     @OneToMany(mappedBy = "userClass",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Cart> carts;

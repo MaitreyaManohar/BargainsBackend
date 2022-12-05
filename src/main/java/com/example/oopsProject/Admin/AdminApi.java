@@ -1,7 +1,5 @@
 package com.example.oopsProject.Admin;
 
-import com.example.oopsProject.Orders.OrderClass;
-import com.example.oopsProject.Orders.OrderService;
 import com.example.oopsProject.OutputClasses.OrderOutput;
 import com.example.oopsProject.OutputClasses.UserOutput;
 import com.example.oopsProject.UserClass.UserService;
@@ -11,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -21,12 +17,11 @@ import java.util.Optional;
 public class AdminApi {
     private final ReportServiceLayer reportServiceLayer;
     private final UserService userService;
-    private final OrderService orderService;
+
     @Autowired
-    public AdminApi(ReportServiceLayer reportServiceLayer, UserService userService, OrderService orderService) {
+    public AdminApi(ReportServiceLayer reportServiceLayer, UserService userService) {
         this.reportServiceLayer = reportServiceLayer;
         this.userService = userService;
-        this.orderService = orderService;
     }
 
     @PostMapping("/getusers")

@@ -2,13 +2,11 @@ package com.example.oopsProject.Items;
 
 import com.example.oopsProject.Cart.Cart;
 import com.example.oopsProject.Images.ImageData;
-import com.example.oopsProject.Orders.OrderClass;
 import com.example.oopsProject.UserClass.Category;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "Items")
@@ -28,8 +26,7 @@ public class ItemClass {
     private int qty;
     private Category category;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "item")
-    private List<OrderClass> orderClasses;
+
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "itemClass")
     private List<Cart> itemClasses;
     @Lob

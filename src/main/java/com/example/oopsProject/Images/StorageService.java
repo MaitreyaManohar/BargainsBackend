@@ -2,6 +2,8 @@ package com.example.oopsProject.Images;
 
 import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Items.ItemRepository;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshot;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshotRepository;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
 import com.example.oopsProject.UserClass.UserRepository;
@@ -13,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,11 +24,14 @@ public class StorageService {
     private ItemRepository itemRepository;
 
     private UserRepository userRepository;
+
+    private final ProductSnapshotRepository productSnapshotRepository;
     @Autowired
-    public StorageService(StorageRepository storageRepository, ItemRepository itemRepository,UserRepository userRepository) {
+    public StorageService(StorageRepository storageRepository, ItemRepository itemRepository, UserRepository userRepository, ProductSnapshotRepository productSnapshotRepository) {
         this.storageRepository = storageRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.productSnapshotRepository = productSnapshotRepository;
     }
 
     public String uploadImage(MultipartFile file, Long itemid, Long requesterId) throws IOException {
@@ -37,6 +43,10 @@ public class StorageService {
             imagecheck.setImageData(file.getBytes());
             imagecheck.setName(file.getOriginalFilename());
             imagecheck.setType(file.getContentType());
+            List<Optional<ProductSnapshot>> productSnapshotList = productSnapshotRepository.findByItemId(itemid);
+            ProductSnapshot productSnapshot = productSnapshotList.get(productSnapshotList.size()-1).get();
+            productSnapshot.setImageData(file.getBytes());
+            productSnapshotRepository.save(productSnapshot);
             storageRepository.save(imagecheck);
             return "Successfully updated";
         }
@@ -48,6 +58,10 @@ public class StorageService {
                 itemRepository.findById(itemid).get()
         );
         item.setImage(imagedata);
+            List<Optional<ProductSnapshot>> productSnapshotList = productSnapshotRepository.findByItemId(itemid);
+            ProductSnapshot productSnapshot = productSnapshotList.get(productSnapshotList.size()-1).get();
+            productSnapshot.setImageData(file.getBytes());
+            productSnapshotRepository.save(productSnapshot);
         ImageData image = storageRepository.save(imagedata
         );
         itemRepository.save(item);

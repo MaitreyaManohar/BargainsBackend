@@ -12,10 +12,13 @@ import com.example.oopsProject.Items.ItemService;
 
 import com.example.oopsProject.Mail.EmailDetails;
 import com.example.oopsProject.Mail.EmailService;
-import com.example.oopsProject.Orders.OrderService;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshot;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshotService;
 import com.example.oopsProject.OutputClasses.OrderOutput;
 import com.example.oopsProject.OutputClasses.ProductOutput;
 import com.example.oopsProject.OutputClasses.UserOutput;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshot;
+import com.example.oopsProject.ProductSnapshot.ProductSnapshotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,22 +38,25 @@ public class UserController {
     private final CartService cartService;
 
     private final ItemService itemService;
-    private final OrderService orderService;
 
     private final EWalletService eWalletService;
 
     private final StorageService imageService;
 
     private final EmailService emailService;
+
+    private final OrderSnapshotService orderSnapshotService;
+    private final ProductSnapshotService productSnapshotService;
     @Autowired
-    public UserController(UserService userService, CartService cartService, ItemService itemService, OrderService orderService, EWalletService eWalletService, StorageService imageService, EmailService emailService) {
+    public UserController(UserService userService, CartService cartService, ItemService itemService, EWalletService eWalletService, StorageService imageService, EmailService emailService, OrderSnapshotService orderSnapshotService, ProductSnapshotService productSnapshotService) {
         this.eWalletService = eWalletService;
-        this.orderService = orderService;
         this.userService = userService;
         this.cartService = cartService;
         this.itemService = itemService;
         this.imageService = imageService;
         this.emailService = emailService;
+        this.orderSnapshotService = orderSnapshotService;
+        this.productSnapshotService = productSnapshotService;
     }
 
 
@@ -86,7 +92,7 @@ public class UserController {
 
     @PostMapping(path = "customer/getpastorders")
     public List<OrderOutput> getPastOrders(@RequestBody addUserClass addUserClass){
-        return orderService.getPastOrders(addUserClass.getId());
+        return orderSnapshotService.getPastOrders(addUserClass.getId());
     }
 
     @PostMapping(path = "customer/getcart")
@@ -180,10 +186,16 @@ public class UserController {
                 .body(uploadImage);
     }
 
+    @GetMapping("/getproductsnapshot/{itemid}")
+    public List<Optional<ProductSnapshot>> getProductSnapshot(@PathVariable("itemid") long itemid){
+        return productSnapshotService.getProductSnapshot(itemid);
+    }
 
 
-
-
+    @GetMapping("/getordersnapshot")
+    public List<OrderSnapshot> getOrderSnapshot(){
+        return orderSnapshotService.getOrderSnapshots();
+    }
 
 
     @PostMapping("/customer/deletefromcart")

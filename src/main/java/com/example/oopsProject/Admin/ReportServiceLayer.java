@@ -2,15 +2,13 @@ package com.example.oopsProject.Admin;
 
 import com.example.oopsProject.Items.ItemClass;
 import com.example.oopsProject.Items.ItemRepository;
-import com.example.oopsProject.Orders.OrderClass;
-import com.example.oopsProject.Orders.OrderRepository;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshot;
+import com.example.oopsProject.OrderSnapshot.OrderSnapshotRepository;
 import com.example.oopsProject.OutputClasses.OrderOutput;
-import com.example.oopsProject.OutputClasses.ProductOutput;
+import com.example.oopsProject.OutputClasses.UserOutput;
 import com.example.oopsProject.UserClass.Role;
 import com.example.oopsProject.UserClass.UserClass;
 import com.example.oopsProject.UserClass.UserRepository;
-import org.apache.catalina.User;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,30 +22,30 @@ import java.util.Optional;
 
 @Service
 public class ReportServiceLayer {
-    private final OrderRepository orderRepository;
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+
+    private final OrderSnapshotRepository orderSnapshotRepository;
     @Autowired
-    public ReportServiceLayer(OrderRepository orderRepository, ItemRepository itemRepository, UserRepository userRepository) {
-        this.orderRepository = orderRepository;
+    public ReportServiceLayer(ItemRepository itemRepository, UserRepository userRepository, OrderSnapshotRepository orderSnapshotRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.orderSnapshotRepository = orderSnapshotRepository;
     }
     @Transactional
     public List<OrderOutput> getOrdersByDate(LocalDate date, long id){
         Optional<UserClass> optionalUserClass = userRepository.findById(id);
         if(optionalUserClass.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User does not Exist! ");
-        UserClass user = userRepository.findById(id).get();
+        UserClass user = optionalUserClass.get();
         List<OrderOutput> orderOutputs = new ArrayList<>();
-        List<Optional<OrderClass>> orders = orderRepository.findBysoldAt(date);
+        List<Optional<OrderSnapshot>> orders = orderSnapshotRepository.findBysoldAt(date);
         if(user.isLoggedin() && user.getRole().equals(Role.ADMIN)){
-            for(Optional<OrderClass> orderClassOptional: orders){
-                OrderClass order = orderClassOptional.get();
+            for(Optional<OrderSnapshot> orderClassOptional: orders){
+                OrderSnapshot order = orderClassOptional.get();
                 OrderOutput neworder = new OrderOutput(order);
-                ProductOutput productOutput = neworder.getItem();
-                productOutput.setImage(null);
-                neworder.setItem(productOutput);
+                Optional<UserClass> buyer = userRepository.findById(order.getBuyerid());
+                if(buyer.isPresent()) neworder.setBuyer(new UserOutput(buyer.get()));
                 orderOutputs.add(neworder);
             }
         return orderOutputs;}
@@ -61,12 +59,11 @@ public class ReportServiceLayer {
         UserClass user = userClass.get();
         List<OrderOutput> orderOutputs = new ArrayList<>();
         if((user.getRole().equals(Role.ADMIN)|| user.getRole().equals(Role.CUSTOMER)) && user.isLoggedin()){
-            for(Optional<OrderClass> orderClassOptional : orderRepository.getCustomerHistoryForMonth(email,month,year)){
-                OrderClass order = orderClassOptional.get();
+            for(Optional<OrderSnapshot> orderClassOptional : orderSnapshotRepository.getCustomerHistoryForMonth(user.getId(),month,year)){
+                OrderSnapshot order = orderClassOptional.get();
                 OrderOutput neworder = new OrderOutput(order);
-                ProductOutput productOutput = neworder.getItem();
-                productOutput.setImage(null);
-                neworder.setItem(productOutput);
+                Optional<UserClass> buyer = userRepository.findById(order.getBuyerid());
+                neworder.setBuyer(new UserOutput(buyer.get()));
                 orderOutputs.add(neworder);
             }
             return orderOutputs;
