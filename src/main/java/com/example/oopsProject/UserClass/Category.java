@@ -4,7 +4,7 @@ public enum Category {
     TECHNOLOGY,
     GROCERIES,
     FASHION,
-    HEALTHCARE,
+    ENTERTAINMENT,
     MISCELLANEOUS
 
 }

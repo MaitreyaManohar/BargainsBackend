@@ -52,11 +52,17 @@ public class OrderSnapshotService {
                 OrderSnapshot order = optionalOrderClass.get();
                 OrderOutput orderOutput = new OrderOutput(order);
                 ItemClass item = itemRepository.findById(order.getItem().getItemId()).get();
-                ImageData imageData = storageRepository.findByItem(item).get();
+                Optional<ImageData> imageDataOptional = storageRepository.findByItem(item);
+                if(imageDataOptional.isPresent()==false) {
+                    orderOutput.setBuyer(new UserOutput(user));
+                    orderOutputs.add(orderOutput);
+                }
+                else {
+                    ImageData imageData = imageDataOptional.get();
                 orderOutput.getItem().setImage(imageData);
                 orderOutput.getItem().getImage().setImageData(imageData.getImageData());
                 orderOutput.setBuyer(new UserOutput(user));
-                orderOutputs.add(orderOutput);
+                orderOutputs.add(orderOutput);}
             }
             return orderOutputs;}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized!!");
