@@ -69,10 +69,9 @@ public class AdminApi {
     }
     @PostMapping("/customerhistory")
     public List<OrderOutput> getCustomerHistory(@RequestBody getOrdersClass getOrdersClass){
-        LocalDate lastDate = LocalDate.now().plusDays(30);
 
 
-        return reportServiceLayer.getCustomerHistory(getOrdersClass.getEmail(),lastDate);
+        return reportServiceLayer.getCustomerHistory(getOrdersClass.getEmail(),getOrdersClass.getMonth(),getOrdersClass.getYear());
 
     }
     @PostMapping("/itemstatus")

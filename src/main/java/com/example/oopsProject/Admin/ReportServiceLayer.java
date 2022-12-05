@@ -55,13 +55,13 @@ public class ReportServiceLayer {
     }
 
     @Transactional
-    public List<OrderOutput> getCustomerHistory(String email, LocalDate lastDate) {
+    public List<OrderOutput> getCustomerHistory(String email, int month, int year) {
         Optional<UserClass> userClass = userRepository.findByEmail(email);
         if(userClass.isPresent()==false) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User does not exist!!");
         UserClass user = userClass.get();
         List<OrderOutput> orderOutputs = new ArrayList<>();
         if((user.getRole().equals(Role.ADMIN)|| user.getRole().equals(Role.CUSTOMER)) && user.isLoggedin()){
-            for(Optional<OrderClass> orderClassOptional : orderRepository.getCustomerHistory(email,lastDate)){
+            for(Optional<OrderClass> orderClassOptional : orderRepository.getCustomerHistoryForMonth(email,month,year)){
                 OrderClass order = orderClassOptional.get();
                 OrderOutput neworder = new OrderOutput(order);
                 ProductOutput productOutput = neworder.getItem();
