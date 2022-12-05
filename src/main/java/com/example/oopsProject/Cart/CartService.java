@@ -103,22 +103,31 @@ public class CartService extends EmailService {
 
         Ewallet ewallet = eWalletRepository.findByowner(userRepository.findById(customerid).get()).get();
         if (ewallet.getBalance()>total) {
-            ewallet.deduct(total);
+            String emailOutput="";
             for (int i = 0;i<cartList.size();i++) {
-                if(cartList.get(i).get().itemClass.getQty()-cartList.get(i).get().qtybought>0){
-                cartList.get(i).get().itemClass.setQty(cartList.get(i).get().itemClass.getQty() - cartList.get(i).get().qtybought);
-//                orderRepository.save(new OrderClass(cartList.get(i).get().userClass,cartList.get(i).get().itemClass, LocalDate.now(),cartList.get(i).get().qtybought));
+                if(cartList.get(i).get().getItemClass().getQty()-cartList.get(i).get().getQtybought()>0){
+                cartList.get(i).get().getItemClass().setQty(cartList.get(i).get().getItemClass().getQty() - cartList.get(i).get().getQtybought());
 
                     OrderSnapshot orderSnapshot = new OrderSnapshot(cartList.get(i).get());
                     List<Optional<ProductSnapshot>> productSnapshot = productSnapshotRepository.findByItemId(cartList.get(i).get().getItemClass().getItemId());
                     orderSnapshot.setItem(productSnapshot.get(productSnapshot.size()-1).get());
                     orderSnapshotRepository.save(orderSnapshot);
-                cartRepository.deleteById(cartList.get(i).get().cartid);
-                sendSimpleMail(new EmailDetails(userRepository.findById(customerid).get().getEmail(),"ORDER SUCCESSFUL",null));
-                return new ResponseEntity<>("SUCCESSFULLY Bought",HttpStatus.OK);
+                    cartRepository.deleteById(cartList.get(i).get().cartid);
+                    emailOutput+=cartList.get(i).get().getItemClass().getItemName()+" x "+cartList.get(i).get().getQtybought()+"\n";
+
                 }
                 else return new ResponseEntity<>("Quantity Bought is more than stock", HttpStatus.BAD_REQUEST);
             }
+            List<Optional<UserClass>> admin = userRepository.findByRole(Role.ADMIN);
+            if(admin.isEmpty() == false && admin.get(0).isPresent()) {Ewallet adminEwallet = eWalletRepository.findByowner(admin.get(0).get()).get();
+                adminEwallet.setBalance(adminEwallet.getBalance()+total);
+                eWalletRepository.save(adminEwallet);
+            }
+            ewallet.deduct(total);
+            eWalletRepository.save(ewallet);
+            sendSimpleMail(new EmailDetails(userClass.get().getEmail(),"Dear "+userClass.get().getName()
+                    +"\n Your order consists of \n "+emailOutput+"\n Thanks for placing the order. "+"\n Regards, \nTeam Bargains","Your Bargains Order has been placed!"));
+            return new ResponseEntity<>("SUCCESSFULLY Bought",HttpStatus.OK);
         }
         return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         }

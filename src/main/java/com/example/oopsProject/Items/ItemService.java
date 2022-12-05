@@ -159,10 +159,15 @@ public class ItemService extends EmailService {
         UserClass user = userRepository.findById(userid).get();
         ItemClass item = itemRepository.findById(productid).get();
         Ewallet eWallet = eWalletRepository.findByowner(user).get();
+        List<Optional<UserClass>> admin = userRepository.findByRole(Role.ADMIN);
         System.out.println("THIS IS QTY BOUGHt");
         if(user.getRole().equals(Role.CUSTOMER) && user.isLoggedin()){
             if(user.getEwallet().getBalance()>=qtybought*item.priceWithOffer() && item.getQty()>=qtybought){
                 eWallet.setBalance(eWallet.getBalance()-qtybought*item.priceWithOffer());
+                if(admin.isEmpty() == false && admin.get(0).isPresent()) {Ewallet adminEwallet = eWalletRepository.findByowner(admin.get(0).get()).get();
+                    adminEwallet.setBalance(adminEwallet.getBalance()+qtybought*item.priceWithOffer());
+                    eWalletRepository.save(adminEwallet);
+                }
                 eWalletRepository.save(eWallet);
                 user.setEwallet(eWallet);
                 item.setQty(item.getQty()-qtybought);
@@ -175,7 +180,9 @@ public class ItemService extends EmailService {
                 List<Optional<ProductSnapshot>> productSnapshot = productSnapshotRepository.findByItemId(productid);
                 orderSnapshot.setItem(productSnapshot.get(productSnapshot.size()-1).get());
                 orderSnapshotRepository.save(orderSnapshot);
-                sendSimpleMail(new EmailDetails(user.getEmail(),"ORDER SUCCESSFUL",null));
+                sendSimpleMail(new EmailDetails(user.getEmail(),"Dear"+user.getName()+",\n Your order for "+item.getItemName()+" with quantity" +
+                        qtybought +
+                        "has been placed successfully. \n Regards,\n Team Bargains.","Bargains Order has been placed!"));
                 return new ResponseEntity<>("Successfully Bought!",HttpStatus.OK);
             }
             else{
