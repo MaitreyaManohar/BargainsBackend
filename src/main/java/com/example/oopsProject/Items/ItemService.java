@@ -107,6 +107,7 @@ public class ItemService extends EmailService {
             itemfound.setItemName(addItemClass.getItemName());
             itemfound.setOffer(addItemClass.getOffer());
             itemfound.setDescription(addItemClass.getDescription());
+            itemfound.setCategory(addItemClass.getCategory());
             productSnapshotRepository.save(new ProductSnapshot(itemfound));
             itemRepository.save(itemfound);
             return new ResponseEntity<>("SUCCESS",HttpStatus.OK);
