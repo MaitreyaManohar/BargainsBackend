@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderSnapshotService {
@@ -62,8 +60,12 @@ public class OrderSnapshotService {
                 orderOutput.getItem().setImage(imageData);
                 orderOutput.getItem().getImage().setImageData(imageData.getImageData());
                 orderOutput.setBuyer(new UserOutput(user));
-                orderOutputs.add(orderOutput);}
+                orderOutputs.add(orderOutput);
+
+                }
+
             }
+            Collections.reverse(orderOutputs);
             return orderOutputs;}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Unauthorized!!");
 
