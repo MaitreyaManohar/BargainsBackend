@@ -245,7 +245,9 @@ public class UserService extends EmailService {
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bad request");
     }
 
+    @Transactional
     public ResponseEntity<?> deleteAccount(String email) {
+        System.out.println("This is the email "+email);
         Optional<UserClass> user = userRepository.findByEmail(email);
         if(user.isPresent()){
             if(user.get().isLoggedin()){

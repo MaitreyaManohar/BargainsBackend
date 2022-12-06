@@ -187,8 +187,9 @@ public class UserController {
     }
 
     @PostMapping("/customer/deleteaccount")
-    public ResponseEntity<?> deleteAccount(removeUser removeUser){
-        return userService.deleteAccount(removeUser.getEmail());
+    public ResponseEntity<?> deleteAccount(@RequestBody LoginClass loginClass){
+        System.out.println("This is email in controller"+loginClass.getEmail());
+        return userService.deleteAccount(loginClass.getEmail());
     }
 
     @PostMapping("/customer/deletefromcart")
