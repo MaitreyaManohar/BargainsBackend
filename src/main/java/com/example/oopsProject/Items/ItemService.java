@@ -133,7 +133,7 @@ public class ItemService extends EmailService {
 
         for(ItemClass item : listofitems){
             System.out.println("This is the ratio: for "+item.getItemName()+searchname+FuzzySearch.weightedRatio(item.getItemName(),searchname));
-            if(FuzzySearch.weightedRatio(item.getItemName(),searchname)>50){
+            if(FuzzySearch.weightedRatio(item.getItemName(),searchname)>50 || FuzzySearch.weightedRatio(item.getDescription(),searchname)>50){
                 searcheditems.add(item);
             }
 
@@ -221,6 +221,6 @@ class SortById implements Comparator<ItemClass> {
     // Used for sorting in ascending order of ID
     public int compare(ItemClass a, ItemClass b)
     {
-        return FuzzySearch.weightedRatio(b.getItemName(),searchname) - FuzzySearch.weightedRatio(a.getItemName(),searchname);
+        return FuzzySearch.weightedRatio(b.getItemName(),searchname)+FuzzySearch.weightedRatio(b.getDescription(),searchname) - FuzzySearch.weightedRatio(a.getItemName(),searchname)-FuzzySearch.weightedRatio(a.getDescription(),searchname);
     }
 }
