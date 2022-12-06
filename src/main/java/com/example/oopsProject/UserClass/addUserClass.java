@@ -19,7 +19,9 @@ public class addUserClass {
         this.balance = balance;
         this.password = password;
     }
-
+    public addUserClass(long id){
+        this.id = id;
+    }
     public addUserClass(UserClass user){
         this.id = user.getId();
         this.email = user.getEmail();
