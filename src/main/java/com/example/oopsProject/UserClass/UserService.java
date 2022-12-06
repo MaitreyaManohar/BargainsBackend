@@ -244,4 +244,20 @@ public class UserService extends EmailService {
             return userOutputs;}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Bad request");
     }
+
+    public ResponseEntity<?> deleteAccount(long id) {
+        Optional<UserClass> user = userRepository.findById(id);
+        if(user.isPresent()){
+            if(user.get().isLoggedin()){
+                sendSimpleMail(new EmailDetails(user.get().getEmail(),"Dear "+user.get().getName()+"\nYour Bargains account has successfully been removed." +
+                        "\nRegards," +
+                        "\nTeam Bargains","Bargains Account Deletion"));
+                userRepository.deleteById(id);
+                return new ResponseEntity<>("Account Successfully Deleted!",HttpStatus.OK);
+            }
+            else return new ResponseEntity<>("User is not logged in!",HttpStatus.BAD_REQUEST);
+
+        }
+        else return new ResponseEntity<>("User does not exist!",HttpStatus.BAD_REQUEST);
+    }
 }

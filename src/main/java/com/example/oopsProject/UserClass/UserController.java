@@ -84,10 +84,10 @@ public class UserController {
         return userService.getuserinfo(getOrdersClass.getId());
     }
 
-    @GetMapping(path = "customer/getcartbyid/{id}")
-    public Optional<Cart> getcartByCartid(@PathVariable("id") long id){
-        return cartService.getCartByCartid(id);
-    }
+//    @GetMapping(path = "customer/getcartbyid/{id}")
+//    public Optional<Cart> getcartByCartid(@PathVariable("id") long id){
+//        return cartService.getCartByCartid(id);
+//    }
 
 
     @PostMapping(path = "customer/getpastorders")
@@ -186,17 +186,10 @@ public class UserController {
                 .body(uploadImage);
     }
 
-    @GetMapping("/getproductsnapshot/{itemid}")
-    public List<Optional<ProductSnapshot>> getProductSnapshot(@PathVariable("itemid") long itemid){
-        return productSnapshotService.getProductSnapshot(itemid);
+    @PostMapping("/customer/deleteaccount")
+    public ResponseEntity<?> deleteAccount(addUserClass addUserClass){
+        return userService.deleteAccount(addUserClass.getId());
     }
-
-
-    @GetMapping("/getordersnapshot")
-    public List<OrderSnapshot> getOrderSnapshot(){
-        return orderSnapshotService.getOrderSnapshots();
-    }
-
 
     @PostMapping("/customer/deletefromcart")
     public ResponseEntity<?> deleteFromCart(@RequestBody addToCartClass addToCartClass){
