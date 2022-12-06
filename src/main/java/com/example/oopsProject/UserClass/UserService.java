@@ -131,12 +131,12 @@ public class UserService extends EmailService {
         if(sender.getRole().equals(Role.ADMIN) && sender.isLoggedin()){
             if(toDelete.getRole().equals(Role.MANAGER) && toDelete.isApproved()==false){
                 userRepository.deleteByEmail(email);
-                sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains application for manager has been rejected. Sorry! ","Application to Bargains"));
+                sendSimpleMail(new EmailDetails(email,"Dear "+toDelete.getName()+",\n\nYour bargains application for manager has been rejected. Sorry!\n\nRegards,\nTeam Bargains","Application to Bargains"));
                 return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
             }
             else{
                 userRepository.deleteByEmail(email);
-                sendSimpleMail(new EmailDetails(email,"Dear User,\n Your bargains account has been removed by the admin. ","Bargains Account Removal"));
+                sendSimpleMail(new EmailDetails(email,"Dear "+toDelete.getName()+"\n\nYour bargains account has been removed by the admin.\n\nRegards,\nTeam Bargains","Bargains Account Removal"));
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);}
         }
         else return new ResponseEntity<>("BADREQUEST", HttpStatus.BAD_REQUEST);
@@ -182,7 +182,7 @@ public class UserService extends EmailService {
         userRepository.save(userClass);
         sendSimpleMail(new EmailDetails(userClass.getEmail(),"Dear "+
                 userClass.getName()+
-                ",\n Your request has been approved! ","Approval in Bargains"));
+                ",\n\nYour request has been approved! \n\nRegards,\nTeam Bargains","Approval in Bargains"));
         return new ResponseEntity<>("SUCCESSFULLY APPROVED",HttpStatus.OK);}
         else return new ResponseEntity<>("Error while trying to approve",HttpStatus.BAD_REQUEST);}
         else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Admin privelages not accessible");

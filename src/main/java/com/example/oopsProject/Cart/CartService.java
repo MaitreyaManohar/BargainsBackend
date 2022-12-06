@@ -126,7 +126,7 @@ public class CartService extends EmailService {
             ewallet.deduct(total);
             eWalletRepository.save(ewallet);
             sendSimpleMail(new EmailDetails(userClass.get().getEmail(),"Dear "+userClass.get().getName()
-                    +"\nYour order consists of \n"+emailOutput+"\nThanks for placing the order. "+"\nRegards, \nTeam Bargains","Your Bargains Order has been placed!"));
+                    +",\n\nYour order consists of \n"+emailOutput+"\nThanks for placing the order. "+"\n\nRegards, \nTeam Bargains","Your Bargains Order has been placed!"));
             return new ResponseEntity<>("SUCCESSFULLY Bought",HttpStatus.OK);
         }
         return new ResponseEntity<>("SUCCESS", HttpStatus.OK);

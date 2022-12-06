@@ -180,9 +180,9 @@ public class ItemService extends EmailService {
                 List<Optional<ProductSnapshot>> productSnapshot = productSnapshotRepository.findByItemId(productid);
                 orderSnapshot.setItem(productSnapshot.get(productSnapshot.size()-1).get());
                 orderSnapshotRepository.save(orderSnapshot);
-                sendSimpleMail(new EmailDetails(user.getEmail(),"Dear"+user.getName()+",\nYour order for "+item.getItemName()+" with quantity" +
-                        qtybought +
-                        " has been placed successfully. \nRegards,\nTeam Bargains.","Bargains Order has been placed!"));
+                sendSimpleMail(new EmailDetails(user.getEmail(),"Dear "+user.getName()+",\n\nYour order for has been placed successfully.\n" +
+                        qtybought +" x "+item.getItemName()+
+                        "\n\nRegards,\nTeam Bargains.","Bargains Order has been placed!"));
                 return new ResponseEntity<>("Successfully Bought!",HttpStatus.OK);
             }
             else{
