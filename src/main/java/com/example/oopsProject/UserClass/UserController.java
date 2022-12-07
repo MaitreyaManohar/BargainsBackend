@@ -155,11 +155,7 @@ public class UserController {
     @PostMapping("/customer/buyfromcart")
     public ResponseEntity<?> buyFromCart(@RequestBody BuyFromCartClass userClass){
         System.out.println("Running the buyfromcartmethod");
-        try{
-        return cartService.buyFromCart(userClass.getUser_id());}
-        catch(Exception e){
-            return new ResponseEntity<>("Thread Exception!",HttpStatus.BAD_REQUEST);
-        }
+        return cartService.buyFromCart(userClass.getUser_id());
     }
 
     @PostMapping("/deleteItem")

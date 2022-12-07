@@ -15,7 +15,6 @@ import com.example.oopsProject.UserClass.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -87,9 +86,7 @@ public class CartService extends EmailService {
         return cartRepository.findById(id);
     }
     @Transactional
-    @Async
-    public ResponseEntity<?> buyFromCart(long customerid) throws InterruptedException{
-        Thread.currentThread().join();
+    public ResponseEntity<?> buyFromCart(long customerid) {
         Optional<UserClass> userClass = userRepository.findById(customerid);
         if(userClass.get().getRole().equals(Role.CUSTOMER) && userClass.get().isLoggedin()){
 
@@ -97,8 +94,9 @@ public class CartService extends EmailService {
         System.out.println("Cart size is "+cartList.size());
         int total = 0;
         for (int i = 0;i<cartList.size();i++) {
-            if (cartList.get(i).get().getItemClass().getQty() >= cartList.get(i).get().qtybought) {
+            if (cartList.get(i).get().getItemClass().getQty() > cartList.get(i).get().qtybought) {
                 total = total + cartList.get(i).get().itemClass.priceWithOffer() * cartList.get(i).get().qtybought;
+
             }
             else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantity chosen is more than the stock!");
         }
