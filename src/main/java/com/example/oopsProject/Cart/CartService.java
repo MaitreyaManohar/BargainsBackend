@@ -94,7 +94,7 @@ public class CartService extends EmailService {
         System.out.println("Cart size is "+cartList.size());
         int total = 0;
         for (int i = 0;i<cartList.size();i++) {
-            if (cartList.get(i).get().getItemClass().getQty() > cartList.get(i).get().qtybought) {
+            if (cartList.get(i).get().getItemClass().getQty() >= cartList.get(i).get().qtybought) {
                 total = total + cartList.get(i).get().itemClass.priceWithOffer() * cartList.get(i).get().qtybought;
 
             }
