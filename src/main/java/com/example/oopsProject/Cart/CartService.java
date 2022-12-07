@@ -91,7 +91,6 @@ public class CartService extends EmailService {
         if(userClass.get().getRole().equals(Role.CUSTOMER) && userClass.get().isLoggedin()){
 
             List<Optional<Cart>> cartList = cartRepository.findByuserClass(userClass.get());
-        System.out.println("Cart size is "+cartList.size());
         int total = 0;
         for (int i = 0;i<cartList.size();i++) {
             if (cartList.get(i).get().getItemClass().getQty() >= cartList.get(i).get().qtybought) {
